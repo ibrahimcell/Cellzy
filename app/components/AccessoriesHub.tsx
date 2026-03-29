@@ -16,7 +16,6 @@ const AIRPODS_MAX_IMGS = [
   { src: "https://www.apple.com/v/airpods-max/k/images/overview/welcome/max-loop_startframe__c0vn1ukmh7ma_xlarge.jpg", alt: "AirPods Max" },
   { src: "https://www.apple.com/v/airpods-max/k/images/overview/media-card/hifi_static__fbsq0dr3be2q_xlarge.jpg",      alt: "AirPods Max Hi-Fi" },
   { src: "https://www.apple.com/v/airpods-max/k/images/overview/media-card/anc_endframe__c4dezlznnsmu_xlarge.jpg",     alt: "AirPods Max ANC" },
-  { src: "https://www.apple.com/v/airpods-max/k/images/overview/product-stories/anc/anc_airpod_max_lifestyle__duzobvqwpz42_large.jpg", alt: "AirPods Max lifestyle" },
 ];
 
 const AIRPODS_PRO_IMGS = [
@@ -88,18 +87,46 @@ const BELKIN_ANKER_IMGS = [
   { src: U("photo-1676116777245-1cc40079cd38"), alt: "Portable power bank" },
 ];
 
+// Combined section-hero image arrays — all products in the category rotate together
+const AUDIO_ALL = [
+  ...AIRPODS_MAX_IMGS,
+  ...AIRPODS_PRO_IMGS,
+  JBL_HEADPHONES_IMGS[0],
+  GALAXY_BUDS_IMGS[0],
+  GALAXY_BUDS_IMGS[1],
+];
+
+const SPEAKERS_ALL = [
+  ...SPEAKERS_MAIN_IMGS,
+  ...SPEAKERS_SECONDARY_IMGS,
+];
+
+const CHARGERS_ALL = [
+  ...WIRELESS_CHARGER_IMGS,
+  ...CAR_CHARGER_IMGS,
+  ...MULTIPORT_CHARGER_IMGS,
+];
+
+const CASES_ALL = [
+  ...OTTERBOX_IMGS,
+  ...IPAD_CASE_IMGS,
+  BELKIN_ANKER_IMGS[0],
+  BELKIN_ANKER_IMGS[1],
+];
+
 // ─────────────────────────────────────────────────────────────────────────────
 // PRIMITIVES
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Parallax — reduced inset to avoid over-cropping images
 function Parallax({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const raw = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
+  const raw = useTransform(scrollYProgress, [0, 1], ["-4%", "4%"]);
   const y   = useSpring(raw, { stiffness: 60, damping: 20, mass: 0.7 });
   return (
     <div ref={ref} style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>
-      <motion.div style={{ y, position: "absolute", inset: "-7%", width: "100%", height: "114%" }}>
+      <motion.div style={{ y, position: "absolute", inset: "-5%", width: "100%", height: "110%" }}>
         {children}
       </motion.div>
     </div>
@@ -126,7 +153,7 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
 // ─────────────────────────────────────────────────────────────────────────────
 
 function TiltCard({
-  images, label, sub, interval = 3500, index = 0, tall = false,
+  images, label, sub, interval = 3500, index = 0, tall = false, objectPosition = "center center",
 }: {
   images: { src: string; alt: string }[];
   label: string;
@@ -134,14 +161,15 @@ function TiltCard({
   interval?: number;
   index?: number;
   tall?: boolean;
+  objectPosition?: string;
 }) {
   const ref    = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-6% 0px" });
 
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
-  const rotX = useSpring(useTransform(my, [-0.5, 0.5], [ 5, -5]), { stiffness: 200, damping: 25 });
-  const rotY = useSpring(useTransform(mx, [-0.5, 0.5], [-5,  5]), { stiffness: 200, damping: 25 });
+  const rotX = useSpring(useTransform(my, [-0.5, 0.5], [ 4, -4]), { stiffness: 200, damping: 25 });
+  const rotY = useSpring(useTransform(mx, [-0.5, 0.5], [-4,  4]), { stiffness: 200, damping: 25 });
 
   const move = (e: React.MouseEvent<HTMLDivElement>) => {
     const r = e.currentTarget.getBoundingClientRect();
@@ -167,26 +195,23 @@ function TiltCard({
           position: "relative",
           overflow: "hidden",
           borderRadius: 22,
-          minHeight: tall ? 560 : 440,
+          minHeight: tall ? 480 : 360,
           cursor: "pointer",
         }}
         whileHover={{ scale: 1.025 }}
         transition={{ type: "spring", stiffness: 260, damping: 22 }}
       >
-        {/* Image */}
         <div style={{ position: "absolute", inset: 0 }}>
-          <ImageCarousel images={images} interval={interval} />
+          <ImageCarousel images={images} interval={interval} objectPosition={objectPosition} />
         </div>
 
-        {/* Gradient overlay */}
         <div style={{
           position: "absolute", inset: 0, pointerEvents: "none", zIndex: 2,
-          background: "linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.28) 42%, transparent 68%)",
+          background: "linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.22) 44%, transparent 68%)",
         }} />
 
-        {/* Label */}
-        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "clamp(20px, 3vw, 36px)", zIndex: 3 }}>
-          <p style={{ fontSize: "clamp(18px, 2.2vw, 28px)", fontWeight: 700, letterSpacing: "-0.03em", color: "#fff", marginBottom: 5, lineHeight: 1.2 }}>
+        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "clamp(18px, 3vw, 32px)", zIndex: 3 }}>
+          <p style={{ fontSize: "clamp(17px, 2vw, 26px)", fontWeight: 700, letterSpacing: "-0.03em", color: "#fff", marginBottom: 4, lineHeight: 1.2 }}>
             {label}
           </p>
           {sub && (
@@ -201,11 +226,11 @@ function TiltCard({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// EDITORIAL CATEGORY HERO  (parallax image + reveal text — like BentoSections)
+// EDITORIAL CATEGORY HERO
 // ─────────────────────────────────────────────────────────────────────────────
 
 function CategoryHero({
-  images, eyebrow, headline, sub, cta, onCTA, align = "left", interval = 3500,
+  images, eyebrow, headline, sub, cta, onCTA, align = "left", interval = 3000,
 }: {
   images: { src: string; alt: string }[];
   eyebrow: string;
@@ -219,34 +244,34 @@ function CategoryHero({
   const right = align === "right";
   return (
     <>
-      {/* Cinematic parallax image */}
+      {/* Parallax hero image — all category products rotate here */}
       <div
         className="img-hover"
-        style={{ height: "clamp(340px, 58vw, 720px)", width: "100%", overflow: "hidden", position: "relative" }}
+        style={{ height: "clamp(300px, 48vw, 600px)", width: "100%", overflow: "hidden", position: "relative" }}
       >
         <Parallax>
-          <ImageCarousel images={images} interval={interval} />
+          <ImageCarousel images={images} interval={interval} objectPosition="center center" />
         </Parallax>
       </div>
 
-      {/* Text */}
+      {/* Text reveal */}
       <div style={{
         maxWidth: 1200,
         margin: "0 auto",
-        padding: "clamp(52px, 8vw, 112px) clamp(24px, 6vw, 96px)",
+        padding: "clamp(48px, 7vw, 104px) clamp(24px, 6vw, 96px)",
         display: "flex",
         flexDirection: "column",
         alignItems: right ? "flex-end" : "flex-start",
         textAlign: right ? "right" : "left",
       }}>
         <Reveal>
-          <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.3em", textTransform: "uppercase", color: "#aeaeb2", marginBottom: 22 }}>
+          <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.3em", textTransform: "uppercase", color: "#aeaeb2", marginBottom: 20 }}>
             {eyebrow}
           </p>
-          <h2 style={{ fontSize: "clamp(44px, 7.5vw, 92px)", fontWeight: 700, letterSpacing: "-0.055em", lineHeight: 0.95, color: "#1d1d1f", marginBottom: 26 }}>
+          <h2 style={{ fontSize: "clamp(42px, 7vw, 88px)", fontWeight: 700, letterSpacing: "-0.055em", lineHeight: 0.95, color: "#1d1d1f", marginBottom: 24 }}>
             {headline}
           </h2>
-          <p style={{ fontSize: "clamp(16px, 1.8vw, 20px)", fontWeight: 300, color: "#6e6e73", maxWidth: 480, lineHeight: 1.68, marginBottom: cta ? 42 : 0 }}>
+          <p style={{ fontSize: "clamp(15px, 1.7vw, 19px)", fontWeight: 300, color: "#6e6e73", maxWidth: 480, lineHeight: 1.7, marginBottom: cta ? 40 : 0 }}>
             {sub}
           </p>
           {cta && onCTA && (
@@ -267,30 +292,28 @@ function CategoryHero({
 function AudioSection() {
   return (
     <section id="audio" style={{ background: "#fff" }}>
-      {/* Editorial hero — AirPods Max */}
       <CategoryHero
-        images={AIRPODS_MAX_IMGS}
+        images={AUDIO_ALL}
         eyebrow="Audio"
         headline={<>Hear it<br />all.</>}
         sub="Premium earbuds, headphones, and over-ear cans from Apple, JBL, Samsung, and more."
-        interval={4200}
+        interval={3200}
       />
 
-      {/* 3-card grid */}
-      <div style={{ padding: "0 clamp(12px, 2vw, 20px) clamp(72px, 11vw, 130px)" }}>
+      <div style={{ padding: "0 clamp(12px, 2vw, 20px) clamp(64px, 10vw, 120px)" }}>
         <div
           id="audio-sub"
           style={{ maxWidth: 1400, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "clamp(8px, 1.2vw, 16px)" }}
         >
-          <TiltCard images={AIRPODS_PRO_IMGS}    label="AirPods Pro 2"              sub="Active noise cancellation. Hearing health." interval={3500} index={0} tall />
-          <TiltCard images={JBL_HEADPHONES_IMGS} label="JBL & Premium Headphones"   sub="Over-ear & on-ear. Every style, every budget." interval={3200} index={1} tall />
-          <TiltCard images={GALAXY_BUDS_IMGS}    label="Samsung Galaxy Buds & More" sub="True wireless. Adaptive sound."             interval={3800} index={2} tall />
+          <TiltCard images={AIRPODS_PRO_IMGS}    label="AirPods Pro 2"              sub="Active noise cancellation. Hearing health." interval={3500} index={0} tall objectPosition="center top" />
+          <TiltCard images={JBL_HEADPHONES_IMGS} label="JBL & Premium Headphones"   sub="Over-ear & on-ear. Every style, every budget." interval={3200} index={1} tall objectPosition="center 35%" />
+          <TiltCard images={GALAXY_BUDS_IMGS}    label="Samsung Galaxy Buds & More" sub="True wireless. Adaptive sound."             interval={3800} index={2} tall objectPosition="center center" />
         </div>
       </div>
 
       <style>{`
         @media (max-width: 860px) { #audio-sub { grid-template-columns: 1fr 1fr !important; } }
-        @media (max-width: 520px) { #audio-sub { grid-template-columns: 1fr      !important; } }
+        @media (max-width: 520px) { #audio-sub { grid-template-columns: 1fr !important; } }
       `}</style>
     </section>
   );
@@ -300,15 +323,15 @@ function SpeakersSection() {
   return (
     <section id="speakers" style={{ background: "#f5f5f7" }}>
       <CategoryHero
-        images={SPEAKERS_MAIN_IMGS}
+        images={SPEAKERS_ALL}
         eyebrow="Speakers"
         headline={<>Fill every<br />room.</>}
         sub="Waterproof, shockproof, go-anywhere portable speakers from JBL, Sony, Bose, and Ultimate Ears."
         align="right"
-        interval={3600}
+        interval={3400}
       />
 
-      <div style={{ padding: "0 clamp(12px, 2vw, 20px) clamp(72px, 11vw, 130px)" }}>
+      <div style={{ padding: "0 clamp(12px, 2vw, 20px) clamp(64px, 10vw, 120px)" }}>
         <div
           id="speakers-sub"
           style={{ maxWidth: 1400, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(8px, 1.2vw, 16px)" }}
@@ -320,6 +343,7 @@ function SpeakersSection() {
             interval={4000}
             index={0}
             tall
+            objectPosition="center center"
           />
           <TiltCard
             images={[SPEAKERS_MAIN_IMGS[1], SPEAKERS_SECONDARY_IMGS[0], SPEAKERS_MAIN_IMGS[2]]}
@@ -328,6 +352,7 @@ function SpeakersSection() {
             interval={3000}
             index={1}
             tall
+            objectPosition="center center"
           />
         </div>
       </div>
@@ -343,20 +368,20 @@ function ChargersSection() {
   return (
     <section id="chargers" style={{ background: "#fff" }}>
       <CategoryHero
-        images={WIRELESS_CHARGER_IMGS}
+        images={CHARGERS_ALL}
         eyebrow="Power & Charging"
         headline={<>Always<br />charged.</>}
         sub="MagSafe, multi-port GaN, and car chargers from Anker, Belkin, and Apple."
-        interval={3500}
+        interval={3000}
       />
 
-      <div style={{ padding: "0 clamp(12px, 2vw, 20px) clamp(72px, 11vw, 130px)" }}>
+      <div style={{ padding: "0 clamp(12px, 2vw, 20px) clamp(64px, 10vw, 120px)" }}>
         <div
           id="chargers-sub"
           style={{ maxWidth: 1400, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(8px, 1.2vw, 16px)" }}
         >
-          <TiltCard images={CAR_CHARGER_IMGS}        label="Car Chargers"               sub="USB-C & Qi wireless. Fast charge on the go." interval={3200} index={0} />
-          <TiltCard images={MULTIPORT_CHARGER_IMGS}  label="Multi-Port GaN Wall Chargers" sub="65W–200W. Anker & Belkin. Charge everything." interval={4000} index={1} />
+          <TiltCard images={CAR_CHARGER_IMGS}       label="Car Chargers"               sub="USB-C & Qi wireless. Fast charge on the go." interval={3200} index={0} objectPosition="center center" />
+          <TiltCard images={MULTIPORT_CHARGER_IMGS} label="Multi-Port GaN Wall Chargers" sub="65W–200W. Anker & Belkin. Charge everything." interval={4000} index={1} objectPosition="center center" />
         </div>
       </div>
 
@@ -373,25 +398,23 @@ function CasesAccessoriesSection() {
   return (
     <section id="cases-accessories" style={{ background: "#f5f5f7" }}>
       <CategoryHero
-        images={OTTERBOX_IMGS}
+        images={CASES_ALL}
         eyebrow="Cases & Accessories"
         headline={<>Protect.<br />Perfect.</>}
         sub="OtterBox, UAG, Belkin, and Anker — the world's best-selling protective cases and accessories."
         align="right"
-        interval={3500}
+        interval={3200}
       />
 
-      <div style={{ padding: "0 clamp(12px, 2vw, 20px) clamp(80px, 12vw, 144px)" }}>
+      <div style={{ padding: "0 clamp(12px, 2vw, 20px) clamp(80px, 12vw, 140px)" }}>
         <div style={{ maxWidth: 1400, margin: "0 auto" }}>
-
-          {/* iPad cases + Belkin/Anker */}
           <div
             id="cases-sub"
             style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(8px, 1.2vw, 16px)" }}
           >
-            <TiltCard images={IPAD_CASE_IMGS} label="iPad Cases" sub="OtterBox Defender, Smart Folio, keyboard cases." interval={4000} index={0} tall />
+            <TiltCard images={IPAD_CASE_IMGS} label="iPad Cases" sub="OtterBox Defender, Smart Folio, keyboard cases." interval={4000} index={0} tall objectPosition="center top" />
 
-            {/* Belkin & Anker full card with CTA */}
+            {/* Belkin & Anker card */}
             <motion.div
               initial={{ opacity: 0, y: 36 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -400,20 +423,20 @@ function CasesAccessoriesSection() {
               style={{ perspective: 900 }}
             >
               <motion.div
-                style={{ position: "relative", overflow: "hidden", borderRadius: 22, minHeight: 560, cursor: "pointer" }}
+                style={{ position: "relative", overflow: "hidden", borderRadius: 22, minHeight: 480, cursor: "pointer" }}
                 whileHover={{ scale: 1.025 }}
                 transition={{ type: "spring", stiffness: 260, damping: 22 }}
               >
                 <div style={{ position: "absolute", inset: 0 }}>
-                  <ImageCarousel images={BELKIN_ANKER_IMGS} interval={3200} />
+                  <ImageCarousel images={BELKIN_ANKER_IMGS} interval={3200} objectPosition="center center" />
                 </div>
                 <div style={{
                   position: "absolute", inset: 0, pointerEvents: "none", zIndex: 2,
-                  background: "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.28) 42%, transparent 68%)",
+                  background: "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.22) 44%, transparent 68%)",
                 }} />
-                <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "clamp(24px, 4vw, 48px)", zIndex: 3, display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 20 }}>
+                <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "clamp(24px, 4vw, 44px)", zIndex: 3, display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 20 }}>
                   <div>
-                    <p style={{ fontSize: "clamp(20px, 2.5vw, 32px)", fontWeight: 700, letterSpacing: "-0.04em", color: "#fff", marginBottom: 6 }}>
+                    <p style={{ fontSize: "clamp(18px, 2.2vw, 30px)", fontWeight: 700, letterSpacing: "-0.04em", color: "#fff", marginBottom: 5 }}>
                       Belkin & Anker
                     </p>
                     <p style={{ fontSize: 13, fontWeight: 300, color: "rgba(255,255,255,0.6)" }}>
