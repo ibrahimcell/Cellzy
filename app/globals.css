@@ -1,0 +1,208 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: #ffffff;
+  --color-foreground: #1d1d1f;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: #ffffff;
+  color: #1d1d1f;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+    "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 980px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  padding: 16px 28px;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  transition: opacity 0.18s ease, transform 0.12s ease;
+}
+.btn:active { transform: scale(0.96); }
+
+.btn-dark  { background: #1d1d1f; color: #fff; }
+.btn-dark:hover  { opacity: 0.82; }
+
+.btn-outline {
+  background: rgba(255,255,255,0.88);
+  color: #1d1d1f;
+  border: 1px solid rgba(0,0,0,0.13);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+.btn-outline:hover { opacity: 0.82; }
+
+.btn-white  { background: #fff; color: #1d1d1f; }
+.btn-white:hover  { opacity: 0.88; }
+
+.btn-ghost {
+  background: rgba(255,255,255,0.16);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.32);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+.btn-ghost:hover { background: rgba(255,255,255,0.26); }
+
+.btn-sm { padding: 12px 22px; font-size: 14px; }
+.btn-lg { padding: 18px 36px; font-size: 16px; }
+
+/* ── Footer links ──────────────────────────────────────────────────────────── */
+.foot-link {
+  font-size: 14px;
+  color: #6e6e73;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+  line-height: 1.5;
+  transition: color 0.15s ease;
+}
+.foot-link:hover { color: #1d1d1f; }
+
+.foot-subtle {
+  color: #1d1d1f;
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.15s ease;
+}
+.foot-subtle:hover { opacity: 0.55; }
+
+/* ── Image card hover ──────────────────────────────────────────────────────── */
+.img-hover img {
+  transition: transform 0.75s cubic-bezier(0.25,0.1,0.25,1);
+}
+.img-hover:hover img { transform: scale(1.05); }
+
+/* ── Marquee ───────────────────────────────────────────────────────────────── */
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee 36s linear infinite;
+  will-change: transform;
+}
+
+/* ── Scrollbar ─────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 999px; }
+
+/* ── Selection ─────────────────────────────────────────────────────────────── */
+::selection { background: rgba(0,0,0,0.07); }
+
+/* ── Form inputs ───────────────────────────────────────────────────────────── */
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.field-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #6e6e73;
+  text-transform: uppercase;
+}
+.field-input {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 15px;
+  font-family: inherit;
+  color: #1d1d1f;
+  background: #f5f5f7;
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.field-input::placeholder { color: #aeaeb2; }
+.field-input:focus {
+  background: #fff;
+  border-color: #1d1d1f;
+}
+.field-input:focus::placeholder { color: #c7c7cc; }
+
+/* ── Modal overlay ─────────────────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0,0,0,0.48);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-card {
+  background: #fff;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 92dvh;
+  overflow-y: auto;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.22), 0 0 0 0.5px rgba(0,0,0,0.06);
+  overscroll-behavior: contain;
+}
+.modal-card::-webkit-scrollbar { display: none; }
+
+/* ── Modal form responsive grid ────────────────────────────────────────────── */
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 480px) {
+  .form-row-2 { grid-template-columns: 1fr; }
+}
+
+/* ── Section scroll offset (account for fixed navbar) ──────────────────────── */
+section[id], header[id] {
+  scroll-margin-top: 64px;
+}
+
+/* ── Navbar desktop links ──────────────────────────────────────────────────── */
+.nav-desktop {
+  display: none;
+}
+@media (min-width: 768px) {
+  .nav-desktop { display: flex; align-items: center; gap: 36px; }
+  .nav-hamburger { display: none !important; }
+}
+.nav-link {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1d1d1f;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+  opacity: 0.72;
+  transition: opacity 0.15s ease;
+}
+.nav-link:hover { opacity: 1; }
