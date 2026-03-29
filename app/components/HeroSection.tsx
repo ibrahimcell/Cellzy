@@ -20,8 +20,6 @@ const HERO_IMAGES = [
   },
 ];
 
-// Brand names
-const BRANDS = ["Apple", "Samsung", "Google", "Motorola", "Huawei", "OnePlus"];
 
 export default function HeroSection() {
   const ref = useRef<HTMLElement>(null);
@@ -97,38 +95,6 @@ export default function HeroSection() {
           padding: "0 24px clamp(48px, 10vw, 92px)",
         }}
       >
-        {/* Brand logos strip */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.08 }}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "clamp(18px, 3vw, 36px)",
-            marginBottom: 26,
-            color: "#c7c7cc",
-          }}
-        >
-          {BRANDS.map((brand, i) => (
-            <motion.span
-              key={brand}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.12 + i * 0.07 }}
-              style={{
-                fontSize: 11,
-                fontWeight: 600,
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                color: "rgba(255,255,255,0.45)",
-              }}
-            >
-              {brand}
-            </motion.span>
-          ))}
-        </motion.div>
-
         {/* Headline */}
         <motion.h1
           initial={{ opacity: 0, y: 28 }}
