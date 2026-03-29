@@ -5,9 +5,12 @@ import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"
 import { useModal } from "./ModalProvider";
 
 const LINKS = [
-  { label: "Shop",        href: "#shop"        },
-  { label: "Accessories", href: "#accessories" },
-  { label: "Repairs",     href: "#repairs"     },
+  { label: "Phones",      href: "#shop"               },
+  { label: "Audio",       href: "#audio"              },
+  { label: "Speakers",    href: "#speakers"           },
+  { label: "Chargers",    href: "#chargers"           },
+  { label: "Cases",       href: "#cases-accessories"  },
+  { label: "Repairs",     href: "#repairs"            },
 ];
 
 export default function Navbar() {

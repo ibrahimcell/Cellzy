@@ -28,7 +28,8 @@
       "WebFetch(domain:fdn2.gsmarena.com)",
       "WebFetch(domain:images.samsung.com)",
       "WebFetch(domain:www.theverge.com)",
-      "WebFetch(domain:semiconductor.samsung.com)"
+      "WebFetch(domain:semiconductor.samsung.com)",
+      "WebFetch(domain:www.pexels.com)"
     ]
   }
 }
