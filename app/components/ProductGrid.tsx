@@ -6,9 +6,9 @@ import ImageCarousel from "./ImageCarousel";
 import { useModal, ModalType } from "./ModalProvider";
 
 const PHONE_IMGS = [
-  { src: "https://images.unsplash.com/photo-1565772506877-e3f1c0cf9b0f?w=2400&q=90&fit=crop&auto=format", alt: "iPhone Pro" },
-  { src: "https://images.unsplash.com/photo-1632661674596-df8be070a5c5?w=2400&q=90&fit=crop&auto=format", alt: "iPhone in hand" },
-  { src: "https://images.unsplash.com/photo-1609692814858-f7cd2f0afa4f?w=2400&q=90&fit=crop&auto=format", alt: "iPhone with accessories" },
+  { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/welcome/hero__bsveixlwbms2_xlarge.jpg", alt: "iPhone 17 Pro Max" },
+  { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/welcome/hero_endframe__gb7f6nb06rau_xlarge.jpg", alt: "iPhone 17 Pro Max — side view" },
+  { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/cameras/intro/hero_camera__f42igewygpqy_xlarge.jpg", alt: "iPhone 17 Pro Max — camera system" },
 ];
 
 const CASE_IMGS = [
