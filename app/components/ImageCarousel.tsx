@@ -11,9 +11,15 @@ interface CarouselImage {
 export default function ImageCarousel({
   images,
   interval = 3200,
+  objectFit = "cover",
+  objectPosition = "center",
+  background = "transparent",
 }: {
   images: CarouselImage[];
   interval?: number;
+  objectFit?: "cover" | "contain";
+  objectPosition?: string;
+  background?: string;
 }) {
   const [index, setIndex] = useState(0);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -32,7 +38,7 @@ export default function ImageCarousel({
   }, [images.length, interval]);
 
   return (
-    <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>
+    <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden", background }}>
       <AnimatePresence initial={false}>
         <motion.img
           key={index}
@@ -48,7 +54,8 @@ export default function ImageCarousel({
             inset: 0,
             width: "100%",
             height: "100%",
-            objectFit: "cover",
+            objectFit,
+            objectPosition,
           }}
         />
       </AnimatePresence>

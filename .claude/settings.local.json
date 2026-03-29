@@ -15,7 +15,20 @@
       "Read(//storage/emulated/0/DCIM/**)",
       "Bash(curl:*)",
       "Bash(git init:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git config:*)",
+      "Bash(git branch:*)",
+      "Bash(git remote:*)",
+      "Bash(git push:*)",
+      "WebFetch(domain:www.samsung.com)",
+      "WebFetch(domain:news.samsung.com)",
+      "WebFetch(domain:image-us.samsung.com)",
+      "WebFetch(domain:www.gsmarena.com)",
+      "WebFetch(domain:fdn2.gsmarena.com)",
+      "WebFetch(domain:images.samsung.com)",
+      "WebFetch(domain:www.theverge.com)",
+      "WebFetch(domain:semiconductor.samsung.com)"
     ]
   }
 }

@@ -6,9 +6,10 @@ import ImageCarousel from "./ImageCarousel";
 import { useModal, ModalType } from "./ModalProvider";
 
 const PHONE_IMGS = [
-  { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/welcome/hero__bsveixlwbms2_xlarge.jpg", alt: "iPhone 17 Pro Max" },
-  { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/welcome/hero_endframe__gb7f6nb06rau_xlarge.jpg", alt: "iPhone 17 Pro Max — side view" },
-  { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/cameras/intro/hero_camera__f42igewygpqy_xlarge.jpg", alt: "iPhone 17 Pro Max — camera system" },
+  { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/welcome/hero__bsveixlwbms2_xlarge.jpg",              alt: "iPhone 17 Pro Max"           },
+  { src: "https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-s26-ultra-new.jpg",                                       alt: "Samsung Galaxy S26 Ultra"    },
+  { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/welcome/hero_endframe__gb7f6nb06rau_xlarge.jpg",    alt: "iPhone 17 Pro Max — angle"   },
+  { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/cameras/intro/hero_camera__f42igewygpqy_xlarge.jpg", alt: "iPhone 17 Pro Max — camera" },
 ];
 
 const CASE_IMGS = [
