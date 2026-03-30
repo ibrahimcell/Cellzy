@@ -20,8 +20,8 @@ const CASE_IMAGES = [
 ];
 
 const REPAIR_IMAGES = [
-  { src: "https://images.unsplash.com/photo-1581092335397-9583eb92d232?w=2400&q=90&fit=crop&auto=format", alt: "Phone repair technician" },
-  { src: "https://images.unsplash.com/photo-1616628188550-808682f3926d?w=2400&q=90&fit=crop&auto=format", alt: "iPhone screen repair"    },
+  { src: "https://images.unsplash.com/photo-1581092335397-9583eb92d232?w=2400&q=90&fit=crop&auto=format", alt: "Device repair" },
+  { src: "https://images.unsplash.com/photo-1580910051074-3eb694886505?w=2400&q=90&fit=crop&auto=format", alt: "iPhone service" },
 ];
 
 // ── Parallax ──────────────────────────────────────────────────────────────────

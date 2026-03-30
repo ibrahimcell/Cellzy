@@ -1,5 +1,4 @@
 import ModalProvider from "./components/ModalProvider";
-import CinematicIntro from "./components/CinematicIntro";
 import Navbar from "./components/Navbar";
 import HeroSection from "./components/HeroSection";
 import MarqueeStrip from "./components/MarqueeStrip";
@@ -12,7 +11,6 @@ import Footer from "./components/Footer";
 export default function Home() {
   return (
     <ModalProvider>
-      <CinematicIntro />
       <Navbar />
       <HeroSection />
       <MarqueeStrip />
