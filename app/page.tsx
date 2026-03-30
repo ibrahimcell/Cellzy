@@ -2,6 +2,7 @@ import ModalProvider from "./components/ModalProvider";
 import Navbar from "./components/Navbar";
 import HeroSection from "./components/HeroSection";
 import MarqueeStrip from "./components/MarqueeStrip";
+import CategoryShowcase from "./components/CategoryShowcase";
 import ProductGrid from "./components/ProductGrid";
 import BentoSections from "./components/BentoSections";
 import AccessoriesHub from "./components/AccessoriesHub";
@@ -13,6 +14,7 @@ export default function Home() {
       <Navbar />
       <HeroSection />
       <MarqueeStrip />
+      <CategoryShowcase />
       <ProductGrid />
       <BentoSections />
       <AccessoriesHub />
