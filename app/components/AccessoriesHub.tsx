@@ -13,9 +13,10 @@ const U = (id: string) =>
   `https://images.unsplash.com/${id}?w=1800&q=88&fit=crop&auto=format`;
 
 const AIRPODS_MAX_IMGS = [
-  { src: "https://www.apple.com/v/airpods-max/k/images/overview/welcome/max-loop_startframe__c0vn1ukmh7ma_xlarge.jpg", alt: "AirPods Max" },
-  { src: "https://www.apple.com/v/airpods-max/k/images/overview/media-card/hifi_static__fbsq0dr3be2q_xlarge.jpg",      alt: "AirPods Max Hi-Fi" },
-  { src: "https://www.apple.com/v/airpods-max/k/images/overview/media-card/anc_endframe__c4dezlznnsmu_xlarge.jpg",     alt: "AirPods Max ANC" },
+  { src: "https://www.apple.com/v/airpods-max/k/images/overview/bento/midnight/bento_1_airpod_max_midnight__4jy1tkqh9qay_xlarge.jpg", alt: "AirPods Max Midnight" },
+  { src: "https://www.apple.com/v/airpods-max/k/images/overview/bento/blue/bento_1_airpod_max_blue__blqgkfdancya_xlarge.jpg",         alt: "AirPods Max Blue"     },
+  { src: "https://www.apple.com/v/airpods-max/k/images/overview/bento/orange/bento_1_airpod_max_orange__btmsk5kl9q3m_xlarge.jpg",     alt: "AirPods Max Orange"   },
+  { src: "https://www.apple.com/v/airpods-max/k/images/overview/bento/purple/bento_1_airpod_max_purple__2udwesqoiyq2_xlarge.jpg",     alt: "AirPods Max Purple"   },
 ];
 
 const AIRPODS_PRO_IMGS = [

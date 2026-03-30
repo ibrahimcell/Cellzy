@@ -14,11 +14,15 @@ const CATEGORIES = [
     label: "Phones",
     sub: "iPhone · Samsung · Google",
     images: [
-      { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/welcome/hero__bsveixlwbms2_xlarge.jpg", alt: "iPhone 17 Pro" },
-      { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/welcome/hero_endframe__gb7f6nb06rau_xlarge.jpg", alt: "iPhone angle" },
+      { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/product-viewer/initial__d2ghrz27b54y_large.jpg",       alt: "iPhone 17 Pro"        },
+      { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/product-viewer/colors_silver__eb8fu7zfvwmu_large.jpg", alt: "iPhone 17 Pro Silver" },
+      { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/product-viewer/colors_blue__li170wg4gkae_large.jpg",   alt: "iPhone 17 Pro Blue"   },
+      { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/product-viewer/colors_orange__cr2oq3n1dwk2_large.jpg", alt: "iPhone 17 Pro Orange" },
     ],
-    interval: 4500,
-    pos: "center 28%",
+    interval: 3800,
+    pos: "center center",
+    fit: "contain" as const,
+    bg: "#0a0a0a",
   },
   {
     id: "audio",
@@ -144,6 +148,8 @@ function CategoryTile({
             images={cat.images}
             interval={cat.interval}
             objectPosition={cat.pos}
+            objectFit={cat.fit ?? "cover"}
+            background={cat.bg ?? "transparent"}
           />
         </div>
 

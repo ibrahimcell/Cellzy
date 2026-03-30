@@ -7,10 +7,10 @@ import { useModal, ModalType } from "./ModalProvider";
 
 // ── Image sets ────────────────────────────────────────────────────────────────
 const PHONE_IMAGES = [
-  { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/welcome/hero__bsveixlwbms2_xlarge.jpg",          alt: "iPhone 17 Pro Max"               },
-  { src: "https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-s26-ultra-new.jpg",                                    alt: "Samsung Galaxy S26 Ultra"        },
-  { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/welcome/hero_endframe__gb7f6nb06rau_xlarge.jpg", alt: "iPhone 17 Pro Max — side view"   },
-  { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/cameras/intro/hero_camera__f42igewygpqy_xlarge.jpg", alt: "iPhone 17 Pro Max — camera"  },
+  { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/welcome/hero__bsveixlwbms2_xlarge.jpg",              alt: "iPhone 17 Pro"        },
+  { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/product-viewer/colors_silver__eb8fu7zfvwmu_large.jpg", alt: "iPhone 17 Pro Silver" },
+  { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/product-viewer/colors_blue__li170wg4gkae_large.jpg",   alt: "iPhone 17 Pro Blue"   },
+  { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/cameras/intro/hero_camera__f42igewygpqy_xlarge.jpg",   alt: "iPhone 17 Pro Camera" },
 ];
 
 const CASE_IMAGES = [

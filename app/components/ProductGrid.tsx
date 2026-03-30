@@ -5,11 +5,12 @@ import { motion, useInView } from "framer-motion";
 import ImageCarousel from "./ImageCarousel";
 import { useModal, ModalType } from "./ModalProvider";
 
+// Portrait product-viewer images — full phone visible, no crop
 const PHONE_IMGS = [
-  { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/welcome/hero__bsveixlwbms2_xlarge.jpg",              alt: "iPhone 17 Pro Max"           },
-  { src: "https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-s26-ultra-new.jpg",                                       alt: "Samsung Galaxy S26 Ultra"    },
-  { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/welcome/hero_endframe__gb7f6nb06rau_xlarge.jpg",    alt: "iPhone 17 Pro Max — angle"   },
-  { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/cameras/intro/hero_camera__f42igewygpqy_xlarge.jpg", alt: "iPhone 17 Pro Max — camera" },
+  { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/product-viewer/initial__d2ghrz27b54y_large.jpg",        alt: "iPhone 17 Pro"        },
+  { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/product-viewer/colors_silver__eb8fu7zfvwmu_large.jpg",  alt: "iPhone 17 Pro Silver" },
+  { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/product-viewer/colors_blue__li170wg4gkae_large.jpg",    alt: "iPhone 17 Pro Blue"   },
+  { src: "https://www.apple.com/v/iphone-17-pro/e/images/overview/product-viewer/colors_orange__cr2oq3n1dwk2_large.jpg",  alt: "iPhone 17 Pro Orange" },
 ];
 
 const CASE_IMGS = [
@@ -30,6 +31,8 @@ const CARDS: {
   img?: string;
   interval?: number;
   span: "half" | "full";
+  imgFit?: "cover" | "contain";
+  imgBg?: string;
 }[] = [
   {
     id: "phones",
@@ -43,6 +46,8 @@ const CARDS: {
     span: "half",
     carousel: PHONE_IMGS,
     interval: 3500,
+    imgFit: "contain",
+    imgBg: "#0a0a0a",
   },
   {
     id: "cases",
@@ -95,7 +100,12 @@ function Card({ card, index }: { card: (typeof CARDS)[0]; index: number }) {
       {/* Image / Carousel */}
       {card.carousel ? (
         <div style={{ position: "absolute", inset: 0 }}>
-          <ImageCarousel images={card.carousel} interval={card.interval ?? 3500} />
+          <ImageCarousel
+            images={card.carousel}
+            interval={card.interval ?? 3500}
+            objectFit={card.imgFit ?? "cover"}
+            background={card.imgBg ?? "transparent"}
+          />
         </div>
       ) : (
         // eslint-disable-next-line @next/next/no-img-element
