@@ -39,16 +39,16 @@ const GALAXY_BUDS_IMGS = [
 ];
 
 const SPEAKERS_MAIN_IMGS = [
-  { src: U("photo-1662647343354-5a03bbbd1d45"), alt: "Waterproof speaker outdoors" },
-  { src: U("photo-1643385958950-8f0b8852171a"), alt: "Bluetooth speaker water" },
-  { src: U("photo-1545454675-3531b543be5d"),    alt: "Portable Bluetooth speaker" },
-  { src: U("photo-1628329567705-f8f7150c3cff"), alt: "Wireless speaker" },
+  { src: U("photo-1690455422058-156a39f18a0a"), alt: "JBL Flip 5 speaker" },
+  { src: U("photo-1598034989845-48532781987e"), alt: "Ultimate Ears WONDERBOOM waterproof" },
+  { src: U("photo-1643901102317-b430b45e4cce"), alt: "Marshall Emberton speaker" },
+  { src: U("photo-1623732900752-75cb69c5963a"), alt: "Bluetooth speaker" },
 ];
 
 const SPEAKERS_SECONDARY_IMGS = [
-  { src: U("photo-1484704849700-f032a568e944"), alt: "Premium audio setup" },
-  { src: U("photo-1583394838336-acd977736f90"), alt: "Studio speaker" },
-  { src: U("photo-1608043152269-423dbba4e7e1"), alt: "Wireless audio" },
+  { src: U("photo-1768618506508-2575a80f4461"), alt: "Bose SoundLink speaker" },
+  { src: U("photo-1549400854-b4300f444934"), alt: "Portable speaker" },
+  { src: U("photo-1767796529694-cb668573dcd5"), alt: "Wireless Bluetooth speaker" },
 ];
 
 const WIRELESS_CHARGER_IMGS = [
@@ -205,13 +205,22 @@ function TiltCard({
           <ImageCarousel images={images} interval={interval} objectPosition={objectPosition} />
         </div>
 
+        {/* Soft vignette — lets image color bleed through */}
         <div style={{
           position: "absolute", inset: 0, pointerEvents: "none", zIndex: 2,
-          background: "linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.22) 44%, transparent 68%)",
+          background: "linear-gradient(to top, rgba(0,0,0,0.15) 0%, transparent 45%)",
         }} />
 
-        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "clamp(18px, 3vw, 32px)", zIndex: 3 }}>
-          <p style={{ fontSize: "clamp(17px, 2vw, 26px)", fontWeight: 700, letterSpacing: "-0.03em", color: "#fff", marginBottom: 4, lineHeight: 1.2 }}>
+        {/* Frosted glass label — text feels the image color behind it */}
+        <div style={{
+          position: "absolute", bottom: 0, left: 0, right: 0,
+          padding: "clamp(16px, 2.5vw, 28px)",
+          background: "rgba(0,0,0,0.26)",
+          backdropFilter: "blur(28px) saturate(180%)",
+          WebkitBackdropFilter: "blur(28px) saturate(180%)",
+          zIndex: 3,
+        }}>
+          <p style={{ fontSize: "clamp(17px, 2vw, 26px)", fontWeight: 700, letterSpacing: "-0.03em", color: "rgba(255,255,255,0.97)", marginBottom: 4, lineHeight: 1.2 }}>
             {label}
           </p>
           {sub && (
@@ -432,9 +441,17 @@ function CasesAccessoriesSection() {
                 </div>
                 <div style={{
                   position: "absolute", inset: 0, pointerEvents: "none", zIndex: 2,
-                  background: "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.22) 44%, transparent 68%)",
+                  background: "linear-gradient(to top, rgba(0,0,0,0.15) 0%, transparent 45%)",
                 }} />
-                <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "clamp(24px, 4vw, 44px)", zIndex: 3, display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 20 }}>
+                <div style={{
+                  position: "absolute", bottom: 0, left: 0, right: 0,
+                  padding: "clamp(24px, 4vw, 44px)",
+                  background: "rgba(0,0,0,0.26)",
+                  backdropFilter: "blur(28px) saturate(180%)",
+                  WebkitBackdropFilter: "blur(28px) saturate(180%)",
+                  zIndex: 3,
+                  display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 20,
+                }}>
                   <div>
                     <p style={{ fontSize: "clamp(18px, 2.2vw, 30px)", fontWeight: 700, letterSpacing: "-0.04em", color: "#fff", marginBottom: 5 }}>
                       Belkin & Anker

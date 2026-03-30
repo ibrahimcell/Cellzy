@@ -82,7 +82,10 @@ export default function HeroSection() {
             fontWeight: 700,
             letterSpacing: "-0.05em",
             lineHeight: 0.94,
-            color: "#ffffff",
+            background: "linear-gradient(180deg, #ffffff 40%, rgba(255,255,255,0.68) 100%)",
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            color: "transparent",
             marginBottom: 22,
           }}
         >
