@@ -82,8 +82,8 @@ const CATEGORIES = [
     label: "Repairs",
     sub: "Same-day · 90-day warranty",
     images: [
-      { src: "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=1400&q=85&fit=crop&auto=format", alt: "Device repair" },
-      { src: U("photo-1581092335397-9583eb92d232"), alt: "Phone repair" },
+      { src: "https://images.unsplash.com/photo-1616628188550-808682f3926d?w=1400&q=85&fit=crop&auto=format", alt: "iPhone screen repair"    },
+      { src: U("photo-1581092335397-9583eb92d232"),                                                           alt: "Phone repair technician" },
     ],
     interval: 4200,
     pos: "center center",

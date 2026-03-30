@@ -72,7 +72,7 @@ const CARDS: {
       { label: "See services",  href: "#repairs",  primary: false },
     ],
     span: "full",
-    img: "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=2400&q=90&fit=crop&auto=format",
+    img: "https://images.unsplash.com/photo-1616628188550-808682f3926d?w=2400&q=90&fit=crop&auto=format",
   },
 ];
 
