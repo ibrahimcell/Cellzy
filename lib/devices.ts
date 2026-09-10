@@ -1,17 +1,19 @@
 export type DeviceKind = "phone" | "tablet";
 
+export type ThreeDModel = {
+  sketchfabId: string;
+  creator: string;
+  source: string;
+  label: "High-detail model" | "Community reference";
+};
+
 export type Device = {
   brand: string;
   model: string;
   kind: DeviceKind;
   family: string;
   aliases?: string[];
-  threeD?: {
-    sketchfabId: string;
-    creator: string;
-    source: string;
-    label: "High-detail model" | "Community reference";
-  };
+  threeD?: ThreeDModel;
 };
 
 const phone = (brand: string, family: string, model: string, aliases?: string[]): Device => ({
@@ -151,6 +153,12 @@ const rawDevices = [
 ];
 
 const threeDModels: Record<string, NonNullable<Device["threeD"]>> = {
+  "Apple::iPhone 14 Pro Max": {
+    sketchfabId: "95f11f5a06604c8b9fd44046ae52a9cc",
+    creator: "akshatmittal",
+    source: "https://sketchfab.com/3d-models/iphone-14-pro-max-95f11f5a06604c8b9fd44046ae52a9cc",
+    label: "High-detail model",
+  },
   "Apple::iPhone 15 Pro Max": {
     sketchfabId: "98895eae0d5c421dbc7fc834a61b947a",
     creator: "Apple Inc.",

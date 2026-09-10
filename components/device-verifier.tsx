@@ -1,11 +1,37 @@
 "use client";
 
-import { ArrowRight, BadgeCheck, Box, ExternalLink, RotateCw } from "lucide-react";
-import type { Device } from "@/lib/devices";
+import { useEffect, useState } from "react";
+import { ArrowRight, BadgeCheck, ExternalLink, LoaderCircle, RotateCw, SearchCheck } from "lucide-react";
+import type { Device, ThreeDModel } from "@/lib/devices";
+
+type LookupModel = ThreeDModel & { matchedName?: string };
 
 export function DeviceVerifier({ device }: { device?: Device }) {
-  if (!device) return null;
+  const [model, setModel] = useState<LookupModel | undefined>(device?.threeD);
+  const [status, setStatus] = useState<"ready" | "loading" | "missing">(device?.threeD ? "ready" : "loading");
 
+  useEffect(() => {
+    if (!device || device.threeD) return;
+
+    const controller = new AbortController();
+    const params = new URLSearchParams({ brand: device.brand, model: device.model });
+    fetch(`/api/device-model?${params}`, { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("No model");
+        return response.json() as Promise<LookupModel>;
+      })
+      .then((match) => {
+        setModel(match);
+        setStatus("ready");
+      })
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        setStatus("missing");
+      });
+    return () => controller.abort();
+  }, [device]);
+
+  if (!device) return null;
   const inquiry = `mailto:info@cellzy.com?subject=${encodeURIComponent(`Device inquiry — ${device.model}`)}&body=${encodeURIComponent(`Hi Cellzy, I'd like to reserve or ask about a ${device.model}.`)}`;
 
   return (
@@ -13,39 +39,45 @@ export function DeviceVerifier({ device }: { device?: Device }) {
       <div className="verifier-copy">
         <p className="verifier-kicker"><span>{device.brand}</span> · {device.family}</p>
         <h3>{device.model}</h3>
-        {device.threeD ? (
+        {status === "ready" && model ? (
           <>
             <p>Inspect the finish, camera layout, frame and controls from every angle before you book.</p>
-            <div className="verifier-status"><BadgeCheck /> {device.threeD.label} · interactive 360°</div>
+            <div className="verifier-status"><BadgeCheck /> {model.label} · interactive 360°</div>
+          </>
+        ) : status === "loading" ? (
+          <>
+            <p>Finding the closest exact-name 3D model from the licensed catalog.</p>
+            <div className="verifier-status is-loading"><LoaderCircle /> Matching 3D model</div>
           </>
         ) : (
           <>
-            <p>We have this device in the Cellzy directory. Its exact licensed 360° model is still being prepared.</p>
-            <div className="verifier-status pending"><Box /> 360° reference coming next</div>
+            <p>No exact-name licensed model passed our match check. We will not show you the wrong phone.</p>
+            <div className="verifier-status pending"><SearchCheck /> Exact model requested</div>
           </>
         )}
         {device.aliases?.length ? <p className="model-alias">Model number: {device.aliases.join(" · ")}</p> : null}
         <a className="verifier-inquiry" href={inquiry}>Reserve or ask about it <ArrowRight /></a>
       </div>
 
-      <div className={device.threeD ? "model-stage is-live" : "model-stage"}>
-        {device.threeD ? (
+      <div className={model ? "model-stage is-live" : "model-stage is-searching"}>
+        {model ? (
           <>
             <iframe
-              key={device.threeD.sketchfabId}
+              key={model.sketchfabId}
               title={`Interactive 360 degree model of ${device.model}`}
-              src={`https://sketchfab.com/models/${device.threeD.sketchfabId}/embed?autostart=1&ui_theme=dark&ui_infos=0&ui_hint=0&ui_controls=1&ui_inspector=0`}
+              src={`https://sketchfab.com/models/${model.sketchfabId}/embed?autostart=1&ui_theme=dark&ui_infos=0&ui_hint=0&ui_controls=1&ui_inspector=0&autospin=.15`}
               loading="lazy"
               allow="autoplay; fullscreen; xr-spatial-tracking"
               allowFullScreen
             />
             <div className="model-instruction"><RotateCw /> Drag to rotate · scroll to zoom</div>
-            <a className="model-credit" href={device.threeD.source} target="_blank" rel="noreferrer">3D by {device.threeD.creator} · CC BY <ExternalLink /></a>
+            <a className="model-credit" href={model.source} target="_blank" rel="noreferrer">3D by {model.creator} · CC licensed <ExternalLink /></a>
           </>
         ) : (
-          <div className="model-pending" aria-label={`A generic placeholder for ${device.model}; not an exact model`}>
-            <div className="wireframe-phone"><i /><b /><span /></div>
-            <small>Exact-model preview pending</small>
+          <div className="model-lookup" role="status">
+            <span><i /><i /><i /></span>
+            <strong>{status === "loading" ? "Matching the exact device" : "Exact model not found"}</strong>
+            <small>{status === "loading" ? "Checking name, generation and variant" : "Cellzy has recorded this model request"}</small>
           </div>
         )}
       </div>
