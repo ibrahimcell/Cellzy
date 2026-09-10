@@ -2,10 +2,9 @@
 
 ## Business details
 
-- Store address
 - Public phone number
 - Opening hours and holiday-hour policy
-- Confirm whether public email should be `info@cellzy.com` or a `cellzy.ca` address
+- Public email confirmed as `info@cellzy.com`
 
 ## Repairs
 
@@ -23,9 +22,8 @@
 
 ## Booking delivery
 
-- Verified Resend account and `RESEND_API_KEY`
-- Verified sender address for `BOOKINGS_FROM_EMAIL`
-- Optional calendar destination if bookings should also create calendar events
+- Booking requests currently open a prepared email addressed to `info@cellzy.com`
+- Optional future calendar destination if bookings should also create calendar events
 
 ## Publishing
 

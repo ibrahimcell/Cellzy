@@ -2,10 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { ArrowDown, ArrowRight, BatteryCharging, Cable, Clock3, Headphones, MapPin, Menu, Search, ShieldCheck, Smartphone, Sparkles, Wrench, X } from "lucide-react";
+import { ArrowDown, ArrowRight, BatteryCharging, Cable, Clock3, Headphones, Menu, RotateCw, Search, ShieldCheck, Smartphone, Sparkles, Wrench, X } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { BookingFlow } from "@/components/booking-flow";
-import { devices, featuredModels } from "@/lib/devices";
+import { DeviceVerifier } from "@/components/device-verifier";
+import { deviceBrands, devices, featuredModels, matchesDevice } from "@/lib/devices";
 
 const categories = [
   { icon: Smartphone, title: "Cases", copy: "Clear, silicone, rugged, folio and fashion cases for current and classic models." },
@@ -19,6 +20,8 @@ const categories = [
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [catalogQuery, setCatalogQuery] = useState("");
+  const [selectedBrand, setSelectedBrand] = useState("All");
+  const [previewModel, setPreviewModel] = useState("");
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add("is-visible")), { threshold: .15 });
     document.querySelectorAll("[data-reveal]").forEach((element) => observer.observe(element));
@@ -26,10 +29,18 @@ export default function Home() {
   }, []);
 
   const matches = useMemo(() => {
-    if (!catalogQuery.trim()) return featuredModels.map((name) => devices.find((item) => item.model === name)).filter(Boolean);
-    const words = catalogQuery.toLowerCase().split(/\s+/).filter(Boolean);
-    return devices.filter((item) => words.every((word) => `${item.brand} ${item.model}`.toLowerCase().includes(word))).slice(0, 12);
-  }, [catalogQuery]);
+    const pool = selectedBrand === "All" ? devices : devices.filter((item) => item.brand === selectedBrand);
+    if (!catalogQuery.trim()) {
+      if (selectedBrand !== "All") return pool.slice(-9).reverse();
+      return featuredModels.map((name) => devices.find((item) => item.model === name)).filter(Boolean);
+    }
+    return pool.filter((item) => matchesDevice(item, catalogQuery)).slice(0, 12);
+  }, [catalogQuery, selectedBrand]);
+
+  const previewDevice = useMemo(() => {
+    const selected = matches.find((item) => item?.model === previewModel);
+    return selected ?? matches[0];
+  }, [matches, previewModel]);
 
   return (
     <main>
@@ -81,11 +92,15 @@ export default function Home() {
       </section>
 
       <section className="device-section" id="devices">
-        <div className="section-heading compact" data-reveal><p className="eyebrow">Devices</p><h2>Find your phone.</h2><p>Search the growing Cellzy model catalogue. Reserve a device or ask us to source it—no online checkout required.</p></div>
+        <div className="section-heading compact" data-reveal><p className="eyebrow">Device directory</p><h2>Find your exact phone.</h2><p>Search {devices.length} phones by name or model number. Inspect supported models in 360°, then reserve a device or repair—no online checkout.</p></div>
         <div className="device-finder" data-reveal>
           <label><Search /><span className="sr-only">Search devices</span><input value={catalogQuery} onChange={(event) => setCatalogQuery(event.target.value)} placeholder="Search iPhone, Galaxy, Pixel, Motorola…" /></label>
+          <div className="brand-filters" aria-label="Filter devices by brand">
+            {["All", ...deviceBrands].map((brand) => <button type="button" key={brand} className={selectedBrand === brand ? "active" : ""} onClick={() => { setSelectedBrand(brand); setPreviewModel(""); }}>{brand}</button>)}
+          </div>
+          {previewDevice ? <DeviceVerifier device={previewDevice} /> : null}
           <div className="device-results">
-            {matches.length ? matches.map((item) => item && <article key={`${item.brand}-${item.model}`}><small>{item.brand}</small><h3>{item.model}</h3><a href={`mailto:info@cellzy.com?subject=${encodeURIComponent(`Device reservation — ${item.model}`)}&body=${encodeURIComponent(`Hi Cellzy, I'd like to reserve or ask about a ${item.model}.`)}`}>Reserve / inquire <ArrowRight /></a></article>) : <article className="no-result"><h3>We can still help.</h3><p>Email the model number and we’ll check availability.</p><a href={`mailto:info@cellzy.com?subject=${encodeURIComponent(`Device inquiry — ${catalogQuery}`)}`}>Ask about this device <ArrowRight /></a></article>}
+            {matches.length ? matches.map((item) => item && <article className={previewDevice?.model === item.model ? "selected-device" : ""} key={`${item.brand}-${item.model}`}><div className="device-card-top"><small>{item.brand} · {item.family}</small>{item.threeD ? <span><RotateCw /> 360°</span> : null}</div><h3>{item.model}</h3>{item.aliases?.length ? <p>Also found as {item.aliases.join(" · ")}</p> : <p>Screen · battery · charging · more</p>}<div className="device-card-actions"><button type="button" onClick={() => setPreviewModel(item.model)}>{item.threeD ? "View in 360°" : "Inspect device"}</button><a href={`mailto:info@cellzy.com?subject=${encodeURIComponent(`Device reservation — ${item.model}`)}&body=${encodeURIComponent(`Hi Cellzy, I'd like to reserve or ask about a ${item.model}.`)}`}>Reserve <ArrowRight /></a></div></article>) : <article className="no-result"><h3>We can still help.</h3><p>Email the exact model number and we’ll check the repair or device options.</p><a href={`mailto:info@cellzy.com?subject=${encodeURIComponent(`Device inquiry — ${catalogQuery}`)}`}>Ask about this device <ArrowRight /></a></article>}
           </div>
         </div>
       </section>
@@ -98,7 +113,7 @@ export default function Home() {
       </section>
 
       <section className="visit-section" id="visit">
-        <div className="visit-copy" data-reveal><p className="eyebrow">Visit Cellzy</p><h2>Walk in.<br />Walk out connected.</h2><p>Repairs, devices and accessories—all with real help from people who know phones.</p><div className="contact-list"><span><MapPin /> Store address coming soon</span><a href="mailto:info@cellzy.com">info@cellzy.com</a><span>Phone and opening hours coming soon</span></div></div>
+        <div className="visit-copy" data-reveal><p className="eyebrow">Talk to Cellzy</p><h2>Walk in.<br />Walk out connected.</h2><p>Repairs, devices and accessories—all with real help from people who know phones.</p><div className="contact-list"><a href="mailto:info@cellzy.com">info@cellzy.com</a><span>Phone and opening hours coming soon</span></div></div>
         <div className="visit-image" data-reveal><Image src="/assets/store-facade.jpg" alt="Cellzy storefront concept" fill sizes="(max-width: 900px) 100vw, 62vw" /></div>
       </section>
 

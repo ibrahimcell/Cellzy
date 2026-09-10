@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { format } from "date-fns";
 import { ArrowLeft, ArrowRight, Check, Search, Wrench } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
-import { devices, featuredModels } from "@/lib/devices";
+import { devices, featuredModels, matchesDevice } from "@/lib/devices";
 
 const issues = ["Cracked screen", "Battery", "Charging port", "Back glass", "Camera", "Water damage", "Software", "Something else"];
 const grades = [
@@ -26,8 +26,7 @@ export function BookingFlow({ initialDevice = "", initialIssue = "" }: { initial
 
   const results = useMemo(() => {
     if (!query.trim()) return featuredModels.map((name) => devices.find((item) => item.model === name)).filter(Boolean).slice(0, 6);
-    const words = query.toLowerCase().split(/\s+/).filter(Boolean);
-    return devices.filter((item) => words.every((word) => `${item.brand} ${item.model}`.toLowerCase().includes(word))).slice(0, 8);
+    return devices.filter((item) => matchesDevice(item, query)).slice(0, 8);
   }, [query]);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {

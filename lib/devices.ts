@@ -1,48 +1,206 @@
-export type Device = { brand: string; model: string; kind: "phone" | "tablet" };
+export type DeviceKind = "phone" | "tablet";
 
-const variants = (brand: string, family: string, years: number[], suffixes: string[] = [""]) =>
-  years.flatMap((year) => suffixes.map((suffix) => ({ brand, model: `${family} ${year}${suffix}`, kind: "phone" as const })));
+export type Device = {
+  brand: string;
+  model: string;
+  kind: DeviceKind;
+  family: string;
+  aliases?: string[];
+  threeD?: {
+    sketchfabId: string;
+    creator: string;
+    source: string;
+    label: "High-detail model" | "Community reference";
+  };
+};
 
-const iphones: Device[] = [
-  ...variants("Apple", "iPhone", [7, 8], ["", " Plus"]),
-  ...["iPhone X", "iPhone XR", "iPhone XS", "iPhone XS Max", "iPhone SE (2nd gen)", "iPhone SE (3rd gen)"].map((model) => ({ brand: "Apple", model, kind: "phone" as const })),
-  ...variants("Apple", "iPhone", [11], ["", " Pro", " Pro Max"]),
-  ...variants("Apple", "iPhone", [12, 13], [" mini", "", " Pro", " Pro Max"]),
-  ...variants("Apple", "iPhone", [14, 15, 16], ["", " Plus", " Pro", " Pro Max"]),
-  ...variants("Apple", "iPhone", [17], ["", " Air", " Pro", " Pro Max"]),
+const phone = (brand: string, family: string, model: string, aliases?: string[]): Device => ({
+  brand,
+  family,
+  model,
+  kind: "phone",
+  aliases,
+});
+
+const series = (brand: string, family: string, models: string[]) =>
+  models.map((model) => phone(brand, family, model));
+
+const iphones: Device[] = series("Apple", "iPhone", [
+  "iPhone 5", "iPhone 5c", "iPhone 5s", "iPhone SE (1st gen)",
+  "iPhone 6", "iPhone 6 Plus", "iPhone 6s", "iPhone 6s Plus",
+  "iPhone 7", "iPhone 7 Plus", "iPhone 8", "iPhone 8 Plus",
+  "iPhone X", "iPhone XR", "iPhone XS", "iPhone XS Max",
+  "iPhone 11", "iPhone 11 Pro", "iPhone 11 Pro Max", "iPhone SE (2nd gen)",
+  "iPhone 12 mini", "iPhone 12", "iPhone 12 Pro", "iPhone 12 Pro Max",
+  "iPhone 13 mini", "iPhone 13", "iPhone 13 Pro", "iPhone 13 Pro Max", "iPhone SE (3rd gen)",
+  "iPhone 14", "iPhone 14 Plus", "iPhone 14 Pro", "iPhone 14 Pro Max",
+  "iPhone 15", "iPhone 15 Plus", "iPhone 15 Pro", "iPhone 15 Pro Max",
+  "iPhone 16e", "iPhone 16", "iPhone 16 Plus", "iPhone 16 Pro", "iPhone 16 Pro Max",
+  "iPhone 17", "iPhone 17 Air", "iPhone 17 Pro", "iPhone 17 Pro Max",
+]);
+
+const galaxyS: Device[] = series("Samsung", "Galaxy S", [
+  "Galaxy S7", "Galaxy S7 edge", "Galaxy S8", "Galaxy S8+", "Galaxy S9", "Galaxy S9+",
+  "Galaxy S10e", "Galaxy S10", "Galaxy S10+", "Galaxy S10 5G",
+  "Galaxy S20", "Galaxy S20+", "Galaxy S20 Ultra", "Galaxy S20 FE",
+  "Galaxy S21", "Galaxy S21+", "Galaxy S21 Ultra", "Galaxy S21 FE",
+  "Galaxy S22", "Galaxy S22+", "Galaxy S22 Ultra",
+  "Galaxy S23", "Galaxy S23+", "Galaxy S23 Ultra", "Galaxy S23 FE",
+  "Galaxy S24", "Galaxy S24+", "Galaxy S24 Ultra", "Galaxy S24 FE",
+  "Galaxy S25", "Galaxy S25+", "Galaxy S25 Edge", "Galaxy S25 Ultra", "Galaxy S25 FE",
+  "Galaxy S26", "Galaxy S26+", "Galaxy S26 Ultra",
+]).map((device) => {
+  const canadianCodes: Record<string, string[]> = {
+    "Galaxy S7": ["SM-G930W8"],
+    "Galaxy S8": ["SM-G950W"],
+    "Galaxy S9": ["SM-G960W"],
+    "Galaxy S10": ["SM-G973W"],
+    "Galaxy S20 Ultra": ["SM-G988W"],
+    "Galaxy S21 Ultra": ["SM-G998W"],
+    "Galaxy S22 Ultra": ["SM-S908W"],
+    "Galaxy S23 Ultra": ["SM-S918W"],
+    "Galaxy S24 Ultra": ["SM-S928W"],
+    "Galaxy S25 Ultra": ["SM-S938W"],
+  };
+  return { ...device, aliases: canadianCodes[device.model] };
+});
+
+const galaxyFoldables = series("Samsung", "Galaxy Z", [
+  "Galaxy Fold", "Galaxy Z Fold2", "Galaxy Z Fold3", "Galaxy Z Fold4", "Galaxy Z Fold5", "Galaxy Z Fold6", "Galaxy Z Fold7",
+  "Galaxy Z Flip", "Galaxy Z Flip 5G", "Galaxy Z Flip3", "Galaxy Z Flip4", "Galaxy Z Flip5", "Galaxy Z Flip6", "Galaxy Z Flip7", "Galaxy Z Flip7 FE",
+]);
+
+const galaxyNote = series("Samsung", "Galaxy Note", [
+  "Galaxy Note 5", "Galaxy Note 7", "Galaxy Note 8", "Galaxy Note 9",
+  "Galaxy Note10", "Galaxy Note10+", "Galaxy Note10 Lite", "Galaxy Note20", "Galaxy Note20 Ultra",
+]);
+
+const galaxyA = series("Samsung", "Galaxy A", [
+  "Galaxy A03", "Galaxy A03s", "Galaxy A04", "Galaxy A04s", "Galaxy A05", "Galaxy A05s",
+  "Galaxy A10", "Galaxy A11", "Galaxy A12", "Galaxy A13", "Galaxy A14", "Galaxy A15", "Galaxy A16",
+  "Galaxy A20", "Galaxy A21", "Galaxy A21s", "Galaxy A22", "Galaxy A23", "Galaxy A24", "Galaxy A25", "Galaxy A26",
+  "Galaxy A30", "Galaxy A31", "Galaxy A32", "Galaxy A33", "Galaxy A34", "Galaxy A35", "Galaxy A36",
+  "Galaxy A42 5G", "Galaxy A50", "Galaxy A51", "Galaxy A52", "Galaxy A53", "Galaxy A54", "Galaxy A55", "Galaxy A56",
+  "Galaxy A70", "Galaxy A71", "Galaxy A72", "Galaxy A73 5G",
+]);
+
+const pixels = series("Google", "Pixel", [
+  "Pixel", "Pixel XL", "Pixel 2", "Pixel 2 XL", "Pixel 3", "Pixel 3 XL", "Pixel 3a", "Pixel 3a XL",
+  "Pixel 4", "Pixel 4 XL", "Pixel 4a", "Pixel 4a 5G", "Pixel 5", "Pixel 5a",
+  "Pixel 6", "Pixel 6 Pro", "Pixel 6a", "Pixel 7", "Pixel 7 Pro", "Pixel 7a",
+  "Pixel 8", "Pixel 8 Pro", "Pixel 8a", "Pixel Fold",
+  "Pixel 9", "Pixel 9 Pro", "Pixel 9 Pro XL", "Pixel 9a", "Pixel 9 Pro Fold",
+  "Pixel 10", "Pixel 10 Pro", "Pixel 10 Pro XL", "Pixel 10 Pro Fold",
+]);
+
+const motorola = [
+  ...series("Motorola", "Moto G", [
+    "Moto G5", "Moto G5 Plus", "Moto G6", "Moto G6 Plus", "Moto G7", "Moto G7 Plus", "Moto G7 Power",
+    "Moto G8", "Moto G8 Power", "Moto G9 Plus", "Moto G Power (2020)", "Moto G Power (2021)",
+    "Moto G Power 5G (2023)", "Moto G Power 5G (2024)", "Moto G 5G (2023)", "Moto G 5G (2024)",
+    "Moto G Stylus 5G (2022)", "Moto G Stylus 5G (2023)", "Moto G Stylus 5G (2024)", "Moto G Stylus 5G (2025)",
+  ]),
+  ...series("Motorola", "Razr", [
+    "Motorola razr (2019)", "Motorola razr 5G", "Motorola razr (2022)",
+    "Motorola razr (2023)", "Motorola razr+ (2023)", "Motorola razr (2024)", "Motorola razr+ (2024)",
+    "Motorola razr (2025)", "Motorola razr Ultra (2025)",
+  ]),
+  ...series("Motorola", "Edge", [
+    "Motorola Edge", "Motorola Edge+", "Motorola Edge 20", "Motorola Edge 20 Pro", "Motorola Edge 30", "Motorola Edge 30 Pro",
+    "Motorola Edge 40", "Motorola Edge 40 Pro", "Motorola Edge 50 Fusion", "Motorola Edge 50 Pro", "Motorola Edge 50 Ultra",
+  ]),
 ];
 
-const galaxyS: Device[] = variants("Samsung", "Galaxy S", Array.from({ length: 20 }, (_, index) => index + 7), ["", " Plus", " Ultra"]);
-const samsungOther: Device[] = [
-  ...variants("Samsung", "Galaxy Note", [8, 9, 10, 20], ["", " Ultra"]),
-  ...variants("Samsung", "Galaxy Z Fold", [1, 2, 3, 4, 5, 6, 7]),
-  ...variants("Samsung", "Galaxy Z Flip", [1, 2, 3, 4, 5, 6, 7]),
-  ...variants("Samsung", "Galaxy A", [10, 11, 12, 13, 14, 15, 20, 21, 22, 23, 24, 25, 32, 33, 34, 35, 42, 51, 52, 53, 54, 55, 56, 70, 71, 72, 73]),
+const onePlus = series("OnePlus", "OnePlus", [
+  "OnePlus 6", "OnePlus 6T", "OnePlus 7", "OnePlus 7 Pro", "OnePlus 7T", "OnePlus 7T Pro",
+  "OnePlus 8", "OnePlus 8 Pro", "OnePlus 8T", "OnePlus 9", "OnePlus 9 Pro", "OnePlus 9R",
+  "OnePlus 10 Pro", "OnePlus 10T", "OnePlus 11", "OnePlus 12", "OnePlus 12R", "OnePlus 13", "OnePlus 13R",
+  "OnePlus Open", "OnePlus Nord N10 5G", "OnePlus Nord N20 5G", "OnePlus Nord N30 5G",
+]);
+
+const lg = [
+  ...series("LG", "LG G", ["LG G5", "LG G6", "LG G7 ThinQ", "LG G8 ThinQ"]),
+  ...series("LG", "LG V", ["LG V20", "LG V30", "LG V35 ThinQ", "LG V40 ThinQ", "LG V50 ThinQ", "LG V60 ThinQ"]),
+  ...series("LG", "LG Velvet", ["LG Velvet", "LG Velvet 5G"]),
+  ...series("LG", "LG Wing", ["LG Wing 5G"]),
 ];
 
-const pixels: Device[] = [
-  ...variants("Google", "Pixel", [2, 3, 4, 5, 6, 7, 8, 9, 10], ["", " Pro"]),
-  ...["Pixel 3a", "Pixel 4a", "Pixel 5a", "Pixel 6a", "Pixel 7a", "Pixel 8a", "Pixel 9a", "Pixel Fold", "Pixel 9 Pro Fold"].map((model) => ({ brand: "Google", model, kind: "phone" as const })),
+const xiaomi = [
+  ...series("Xiaomi", "Xiaomi", [
+    "Xiaomi 11", "Xiaomi 11 Pro", "Xiaomi 11 Ultra", "Xiaomi 12", "Xiaomi 12 Pro", "Xiaomi 12T Pro",
+    "Xiaomi 13", "Xiaomi 13 Pro", "Xiaomi 13 Ultra", "Xiaomi 14", "Xiaomi 14 Pro", "Xiaomi 14 Ultra",
+    "Xiaomi 15", "Xiaomi 15 Pro", "Xiaomi 15 Ultra",
+  ]),
+  ...series("Xiaomi", "Redmi Note", [
+    "Redmi Note 10", "Redmi Note 10 Pro", "Redmi Note 11", "Redmi Note 11 Pro", "Redmi Note 12", "Redmi Note 12 Pro",
+    "Redmi Note 13", "Redmi Note 13 Pro", "Redmi Note 14", "Redmi Note 14 Pro",
+  ]),
 ];
 
-const motorola: Device[] = [
-  ...variants("Motorola", "moto g", [5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 75, 80, 85]),
-  ...["razr 2019", "razr 5G", "razr 2022", "razr 2023", "razr+ 2023", "razr 2024", "razr+ 2024", "Edge", "Edge+", "Edge 20", "Edge 30", "Edge 40", "Edge 50"].map((model) => ({ brand: "Motorola", model, kind: "phone" as const })),
+const rawDevices = [
+  ...iphones,
+  ...galaxyS,
+  ...galaxyFoldables,
+  ...galaxyNote,
+  ...galaxyA,
+  ...pixels,
+  ...motorola,
+  ...onePlus,
+  ...lg,
+  ...xiaomi,
 ];
 
-const others: Device[] = [
-  ...variants("OnePlus", "OnePlus", [7, 8, 9, 10, 11, 12, 13], ["", " Pro"]),
-  ...variants("LG", "LG G", [6, 7, 8]),
-  ...variants("Xiaomi", "Xiaomi", [11, 12, 13, 14, 15], ["", " Pro", " Ultra"]),
-];
+const threeDModels: Record<string, NonNullable<Device["threeD"]>> = {
+  "Apple::iPhone 15 Pro Max": {
+    sketchfabId: "98895eae0d5c421dbc7fc834a61b947a",
+    creator: "Apple Inc.",
+    source: "https://sketchfab.com/3d-models/iphone-15-pro-max-natural-titanium-98895eae0d5c421dbc7fc834a61b947a",
+    label: "High-detail model",
+  },
+  "Apple::iPhone 16 Pro Max": {
+    sketchfabId: "41a071ae12794b668502f58d1e0fd1a3",
+    creator: "MajdyModels",
+    source: "https://sketchfab.com/3d-models/iphone-16-pro-max-41a071ae12794b668502f58d1e0fd1a3",
+    label: "High-detail model",
+  },
+  "Apple::iPhone 17 Pro": {
+    sketchfabId: "4541aa8a28324b33a2baaf81d263aaec",
+    creator: "Ranguel",
+    source: "https://sketchfab.com/3d-models/iphone-17-pro-4541aa8a28324b33a2baaf81d263aaec",
+    label: "Community reference",
+  },
+  "Apple::iPhone 17 Pro Max": {
+    sketchfabId: "87fc1df741384124a8ce0226d2b2058d",
+    creator: "MajdyModels",
+    source: "https://sketchfab.com/3d-models/iphone-17-pro-max-87fc1df741384124a8ce0226d2b2058d",
+    label: "Community reference",
+  },
+  "Samsung::Galaxy S24 Ultra": {
+    sketchfabId: "47d62c4026fb4372ae83b11bf288018c",
+    creator: "Debesis6",
+    source: "https://sketchfab.com/3d-models/samsung-s24-ultra-47d62c4026fb4372ae83b11bf288018c",
+    label: "High-detail model",
+  },
+};
 
-export const devices = [...iphones, ...galaxyS, ...samsungOther, ...pixels, ...motorola, ...others];
+export const devices = rawDevices.map((device) => ({
+  ...device,
+  threeD: threeDModels[`${device.brand}::${device.model}`],
+}));
+
+export const deviceBrands = ["Apple", "Samsung", "Google", "Motorola", "OnePlus", "LG", "Xiaomi"];
+
+export function matchesDevice(device: Device, query: string) {
+  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+  const haystack = [device.brand, device.family, device.model, ...(device.aliases ?? [])].join(" ").toLowerCase();
+  return words.every((word) => haystack.includes(word));
+}
 
 export const featuredModels = [
   "iPhone 17 Pro Max",
   "iPhone 16 Pro",
   "Galaxy S26 Ultra",
-  "Galaxy Z Fold 7",
+  "Galaxy Z Fold7",
   "Pixel 10 Pro",
-  "Motorola razr 2024",
+  "Motorola razr (2024)",
 ];
