@@ -10,6 +10,11 @@ type SketchfabResult = {
   user?: { displayName?: string; username?: string };
 };
 
+type SketchfabSearch = {
+  results?: SketchfabResult[];
+  next?: string | null;
+};
+
 const allowedLicenses = new Set(["CC Attribution", "CC0 Public Domain"]);
 const variantWords = new Set(["air", "edge", "fe", "flip", "fold", "lite", "max", "mini", "plus", "pro", "stylus", "ultra"]);
 
@@ -17,6 +22,9 @@ function words(value: string) {
   return value
     .normalize("NFKD")
     .toLowerCase()
+    .replace(/\b(?:3d|5g)\b/g, " ")
+    .replace(/([a-z])(\d)/g, "$1 $2")
+    .replace(/(\d)([a-z])/g, "$1 $2")
     .replace(/[^a-z0-9+]+/g, " ")
     .trim()
     .split(/\s+/)
@@ -24,16 +32,17 @@ function words(value: string) {
 }
 
 function isStrictModelMatch(target: string, candidate: string) {
-  const targetWords = words(target);
-  const candidateWords = words(candidate);
+  const brandWords = new Set(["apple", "google", "galaxy", "lg", "motorola", "oneplus", "samsung", "xiaomi"]);
+  const targetWords = words(target).filter((word) => !brandWords.has(word));
+  const candidateWords = words(candidate).filter((word) => !brandWords.has(word));
   if (!targetWords.every((word) => candidateWords.includes(word))) return false;
 
   for (const variant of variantWords) {
     if (candidateWords.includes(variant) && !targetWords.includes(variant)) return false;
   }
 
-  const targetIds = targetWords.filter((word) => /^(?:\d{1,2}[a-z]?|[as]\d{1,3}|z\d|fold\d|flip\d)$/i.test(word));
-  const candidateIds = candidateWords.filter((word) => /^(?:\d{1,2}[a-z]?|[as]\d{1,3}|z\d|fold\d|flip\d)$/i.test(word));
+  const targetIds = targetWords.filter((word) => /^\d{1,3}$/.test(word));
+  const candidateIds = candidateWords.filter((word) => /^\d{1,3}$/.test(word));
   return candidateIds.every((id) => targetIds.includes(id)) || candidateIds.length === 0;
 }
 
@@ -51,17 +60,39 @@ export async function GET(request: Request) {
   const model = searchParams.get("model")?.trim().slice(0, 100) ?? "";
   if (!brand || !model) return NextResponse.json({ error: "Missing device" }, { status: 400 });
 
-  const apiUrl = new URL("https://api.sketchfab.com/v3/search");
-  apiUrl.searchParams.set("type", "models");
-  apiUrl.searchParams.set("q", `${brand} ${model}`);
-  apiUrl.searchParams.set("downloadable", "true");
-  apiUrl.searchParams.set("sort_by", "-likeCount");
-
   try {
-    const response = await fetch(apiUrl, { next: { revalidate: 86400 } });
-    if (!response.ok) throw new Error(`Sketchfab ${response.status}`);
-    const payload = await response.json() as { results?: SketchfabResult[] };
-    const candidates = (payload.results ?? [])
+    const compact = words(model).join("");
+    const withoutBrand = compact.replace(words(brand).join(""), "");
+    const queries = [...new Set([model, compact, withoutBrand].filter((query) => query.length > 1))];
+    const searchUrls = queries.flatMap((query) => {
+      const textSearch = new URL("https://api.sketchfab.com/v3/search");
+      textSearch.searchParams.set("type", "models");
+      textSearch.searchParams.set("q", query);
+      textSearch.searchParams.set("downloadable", "true");
+      const tagSearch = new URL(textSearch);
+      tagSearch.searchParams.delete("q");
+      tagSearch.searchParams.append("tags", query.replace(/\s+/g, ""));
+      return [textSearch.toString(), tagSearch.toString()];
+    });
+
+    async function search(url: string) {
+      const found: SketchfabResult[] = [];
+      let page: string | null = url;
+      for (let index = 0; index < 3 && page; index += 1) {
+        const response = await fetch(page, { next: { revalidate: 86400 } });
+        if (!response.ok) break;
+        const payload = await response.json() as SketchfabSearch;
+        found.push(...(payload.results ?? []));
+        if ((payload.results ?? []).some((result) => result.name && allowedLicenses.has(result.license?.label ?? "") && isStrictModelMatch(model, result.name))) break;
+        page = payload.next ?? null;
+      }
+      return found;
+    }
+
+    const resultPages = await Promise.all(searchUrls.map(search));
+    const unique = new Map<string, SketchfabResult>();
+    resultPages.flat().forEach((result) => result.uid && unique.set(result.uid, result));
+    const candidates = [...unique.values()]
       .filter((result) => result.uid && result.name && allowedLicenses.has(result.license?.label ?? ""))
       .filter((result) => isStrictModelMatch(model, result.name ?? ""))
       .sort((a, b) => rank(model, b) - rank(model, a));
@@ -71,7 +102,7 @@ export async function GET(request: Request) {
     return NextResponse.json({
       sketchfabId: match.uid,
       creator: match.user?.displayName || match.user?.username || "Sketchfab creator",
-      source: match.viewerUrl || `https://sketchfab.com/models/${match.uid}`,
+      source: `https://sketchfab.com/models/${match.uid}`,
       label: "Community reference",
       matchedName: match.name,
     }, { headers: { "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800" } });
