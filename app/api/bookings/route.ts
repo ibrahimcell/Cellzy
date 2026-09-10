@@ -1,9 +1,30 @@
 import { NextResponse } from "next/server";
 
+type BookingPayload = {
+  device: string;
+  issue: string;
+  date: string;
+  time: string;
+  name: string;
+  email: string;
+  phone?: string;
+  screenGrade?: string;
+  notes?: string;
+};
+
 export async function POST(request: Request) {
-  const booking = await request.json();
-  const required = ["device", "issue", "date", "time", "name", "email"];
-  if (required.some((key) => !booking[key])) return NextResponse.json({ error: "Missing booking details" }, { status: 400 });
+  const payload: unknown = await request.json();
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    return NextResponse.json({ error: "Invalid booking details" }, { status: 400 });
+  }
+
+  const candidate = payload as Record<string, unknown>;
+  const required: Array<keyof BookingPayload> = ["device", "issue", "date", "time", "name", "email"];
+  if (required.some((key) => typeof candidate[key] !== "string" || !candidate[key].trim())) {
+    return NextResponse.json({ error: "Missing booking details" }, { status: 400 });
+  }
+
+  const booking = candidate as BookingPayload;
 
   const subject = `Cellzy repair request — ${booking.device}`;
   const lines = [

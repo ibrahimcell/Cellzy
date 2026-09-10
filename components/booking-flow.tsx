@@ -50,9 +50,14 @@ export function BookingFlow({ initialDevice = "", initialIssue = "" }: { initial
           notes: data.get("notes"),
         }),
       });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Could not send booking");
-      if (result.mailto) {
+      const payload: unknown = await response.json();
+      const result = payload && typeof payload === "object" && !Array.isArray(payload)
+        ? payload as { error?: unknown; mailto?: unknown }
+        : {};
+      if (!response.ok) {
+        throw new Error(typeof result.error === "string" ? result.error : "Could not send booking");
+      }
+      if (typeof result.mailto === "string") {
         window.location.href = result.mailto;
         setStatus("email");
       } else setStatus("sent");
