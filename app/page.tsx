@@ -55,6 +55,7 @@ export default function Home() {
   const [previewModel, setPreviewModel] = useState("");
   const [issueSelection, setIssueSelection] = useState<{ deviceKey: string; issue: RepairIssue } | null>(null);
   useEffect(() => {
+    document.documentElement.classList.add("js-ready");
     const observer = new IntersectionObserver((entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add("is-visible")), { threshold: .15 });
     document.querySelectorAll("[data-reveal]").forEach((element) => observer.observe(element));
     return () => observer.disconnect();
