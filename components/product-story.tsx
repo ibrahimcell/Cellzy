@@ -4,83 +4,49 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { ArrowDown, ArrowRight } from "lucide-react";
 
-const clamp = (value: number) => Math.min(1, Math.max(0, value));
-
-export function ProductStory() {
+export function ProductStory({ onBook }: { onBook: () => void }) {
   const sectionRef = useRef<HTMLElement>(null);
-  const actionRef = useRef<HTMLAnchorElement>(null);
-  const frameRef = useRef<number | null>(null);
 
   useEffect(() => {
     const section = sectionRef.current;
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (!section) return;
-
+    let frame = 0;
     const update = () => {
-      frameRef.current = null;
+      frame = 0;
       const bounds = section.getBoundingClientRect();
-      const travel = Math.max(1, section.offsetHeight - window.innerHeight);
-      const progress = clamp(-bounds.top / travel);
-      const proOpacity = clamp(0.2 + progress * 1.2);
-      const proCopy = clamp(progress * 1.25);
-      const storyScroll = clamp(1 - progress * 2.2);
-
-      section.style.setProperty("--story-background", "#050505");
-      section.style.setProperty("--pro-opacity", `${proOpacity}`);
-      section.style.setProperty("--pro-scale", `${1.035 - proOpacity * 0.035}`);
-      section.style.setProperty("--pro-copy", `${proCopy}`);
-      section.style.setProperty("--pro-copy-y", `${(1 - proCopy) * 20}px`);
-      section.style.setProperty("--story-progress-height", `${progress * 120}px`);
-      section.style.setProperty("--story-scroll-opacity", `${storyScroll}`);
-
-      if (actionRef.current) {
-        actionRef.current.tabIndex = proCopy > 0.88 ? 0 : -1;
-        actionRef.current.setAttribute("aria-hidden", proCopy > 0.88 ? "false" : "true");
-      }
+      // Native scroll; only the image shifts, never the visibility of content.
+      const offset = preference.matches ? 0 : Math.min(32, Math.max(0, -bounds.top * .06));
+      section.style.setProperty("--hero-shift", `${offset}px`);
     };
-
-    const requestUpdate = () => {
-      if (frameRef.current !== null) return;
-      frameRef.current = window.requestAnimationFrame(update);
-    };
-
-    frameRef.current = window.requestAnimationFrame(update);
+    const requestUpdate = () => { if (!frame) frame = requestAnimationFrame(update); };
     window.addEventListener("scroll", requestUpdate, { passive: true });
-    window.addEventListener("resize", requestUpdate);
-
+    preference.addEventListener("change", requestUpdate);
+    update();
     return () => {
       window.removeEventListener("scroll", requestUpdate);
-      window.removeEventListener("resize", requestUpdate);
-      if (frameRef.current !== null) {
-        window.cancelAnimationFrame(frameRef.current);
-      }
+      preference.removeEventListener("change", requestUpdate);
+      cancelAnimationFrame(frame);
     };
   }, []);
 
   return (
-    <section ref={sectionRef} className="product-story product-film" id="top" aria-label="Cellzy new iPhone story">
-      <div className="story-sticky">
-        <section className="product-scene pro-scene" aria-label="iPhone 18 Pro Max in burgundy">
-          <Image
-            className="pro-product-image"
-            src="/assets/products/iphone-18-pro-burgundy.jpg"
-            alt="Burgundy iPhone 18 Pro Max camera detail"
-            fill
-            sizes="100vw"
-            priority
-          />
-          <div className="film-copy pro-film-copy">
-            <span>Now in burgundy</span>
-            <h2>iPhone 18 Pro Max</h2>
-            <p>Pro, from every angle.</p>
-          </div>
-          <a ref={actionRef} className="story-action" href="#repairs" tabIndex={-1} aria-hidden="true">
-            Explore Cellzy care <ArrowRight />
-          </a>
-        </section>
-
-        <div className="story-progress" aria-hidden="true"><span>18 PRO MAX</span></div>
-        <div className="story-scroll" aria-hidden="true"><ArrowDown /><span>Scroll</span></div>
+    <section ref={sectionRef} className="cellzy-hero" id="top" aria-labelledby="hero-title">
+      <div className="hero-copy">
+        <p className="hero-intro-label">Phones. Accessories. Repairs.</p>
+        <h1 id="hero-title">Your phone.<br />In good hands.</h1>
+        <p className="hero-intro">A fresh start for your phone. A little more you in every accessory. Expert care, all at Cellzy.</p>
+        <div className="hero-actions">
+          <button type="button" className="primary-button" onClick={onBook}>Book a repair <ArrowRight aria-hidden="true" /></button>
+          <a className="text-link" href="#devices">Find your phone</a>
+        </div>
+        <div className="hero-note"><span>30 min</span><p>Most standard repairs.<br />More time for your day.</p></div>
       </div>
+      <div className="hero-media">
+        <Image src="/assets/hero-device.jpg" alt="A phone suspended above an open hand against a warm orange background" fill sizes="(max-width: 760px) 100vw, 50vw" preload />
+        <a href="#accessories" className="hero-image-caption"><span>Made for your everyday.</span><ArrowRight aria-hidden="true" /></a>
+      </div>
+      <a className="hero-scroll" href="#repairs"><ArrowDown aria-hidden="true" /><span>A little care goes a long way</span></a>
     </section>
   );
 }

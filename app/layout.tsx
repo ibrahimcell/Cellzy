@@ -4,9 +4,8 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "CELLZY — Phones, Accessories & Repairs",
   description: "Phones, accessories and fast repairs for iPhone, Samsung, Motorola and more. Reserve your repair with Cellzy.",
-  other: {
-    "codex-preview": "development",
-  },
+  metadataBase: new URL("https://www.cellzy.ca"),
+  alternates: { canonical: "/" },
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",

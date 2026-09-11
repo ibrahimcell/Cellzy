@@ -38,7 +38,7 @@ const iphones: Device[] = series("Apple", "iPhone", [
   "iPhone 14", "iPhone 14 Plus", "iPhone 14 Pro", "iPhone 14 Pro Max",
   "iPhone 15", "iPhone 15 Plus", "iPhone 15 Pro", "iPhone 15 Pro Max",
   "iPhone 16e", "iPhone 16", "iPhone 16 Plus", "iPhone 16 Pro", "iPhone 16 Pro Max",
-  "iPhone 17", "iPhone 17 Air", "iPhone 17 Pro", "iPhone 17 Pro Max",
+  "iPhone 17", "iPhone Air", "iPhone 17e", "iPhone 17 Pro", "iPhone 17 Pro Max",
   "iPhone 18 Pro", "iPhone 18 Pro Max", "iPhone Duo",
 ]);
 
@@ -200,16 +200,17 @@ export const devices = rawDevices.map((device) => ({
 export const deviceBrands = ["Apple", "Samsung", "Google", "Motorola", "OnePlus", "LG", "Xiaomi"];
 
 export function matchesDevice(device: Device, query: string) {
-  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
-  const haystack = [device.brand, device.family, device.model, ...(device.aliases ?? [])].join(" ").toLowerCase();
+  const normalize = (value: string) => value.toLowerCase().replace(/\+/g, "plus").replace(/[^a-z0-9]/g, "");
+  const words = query.toLowerCase().trim().split(/\s+/).filter(Boolean).map(normalize);
+  const haystack = normalize([device.brand, device.family, device.model, ...(device.aliases ?? [])].join(" "));
   return words.every((word) => haystack.includes(word));
 }
 
 export const featuredModels = [
-  "iPhone Duo",
-  "iPhone 18 Pro Max",
+  "iPhone 13 Pro Max",
+  "iPhone 15 Pro Max",
+  "iPhone 17 Pro Max",
+  "Galaxy S24 Ultra",
   "Galaxy S26 Ultra",
-  "Galaxy Z Fold7",
   "Pixel 10 Pro",
-  "Motorola razr (2024)",
 ];

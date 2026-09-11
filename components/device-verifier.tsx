@@ -1,99 +1,57 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ArrowRight, BadgeCheck, ExternalLink, LoaderCircle, RotateCw, SearchCheck } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ChevronDown, ExternalLink, LoaderCircle, RotateCw } from "lucide-react";
 import type { Device, ThreeDModel } from "@/lib/devices";
 
-type LookupModel = ThreeDModel & { matchedName?: string };
+export function DeviceVerifier({ device }: { device: Device }) {
+  const [open, setOpen] = useState(false);
+  const [model, setModel] = useState<ThreeDModel | undefined>(device.threeD);
+  const [status, setStatus] = useState<"idle" | "loading" | "ready" | "missing">(device.threeD ? "ready" : "idle");
+  const [viewerLoaded, setViewerLoaded] = useState(false);
+  const [viewerSlow, setViewerSlow] = useState(false);
+  const controller = useRef<AbortController | null>(null);
 
-export function DeviceVerifier({ device }: { device?: Device }) {
-  const [model, setModel] = useState<LookupModel | undefined>(device?.threeD);
-  const [status, setStatus] = useState<"ready" | "loading" | "missing">(device?.threeD ? "ready" : "loading");
-
+  useEffect(() => () => controller.current?.abort(), []);
   useEffect(() => {
-    if (!device || device.threeD) return;
+    if (!open || !model || viewerLoaded) return;
+    const timeout = window.setTimeout(() => setViewerSlow(true), 12000);
+    return () => window.clearTimeout(timeout);
+  }, [open, model, viewerLoaded]);
 
-    const controller = new AbortController();
-    const params = new URLSearchParams({ brand: device.brand, model: device.model });
-    fetch(`/api/device-model?${params}`, { signal: controller.signal })
-      .then(async (response) => {
-        if (!response.ok) throw new Error("No model");
-        return response.json() as Promise<LookupModel>;
-      })
-      .then((match) => {
-        setModel(match);
-        setStatus("ready");
-      })
-      .catch((error: unknown) => {
-        if (error instanceof DOMException && error.name === "AbortError") return;
-        setStatus("missing");
-      });
-    return () => controller.abort();
-  }, [device]);
-
-  if (!device) return null;
-  const usesCellzyDuoModel = device.model === "iPhone Duo";
-  const inquiry = `mailto:info@cellzy.com?subject=${encodeURIComponent(`Device inquiry — ${device.model}`)}&body=${encodeURIComponent(`Hi Cellzy, I'd like to reserve or ask about a ${device.model}.`)}`;
+  async function toggle() {
+    setOpen(!open);
+    if (!open) { setViewerLoaded(false); setViewerSlow(false); }
+    if (open || status !== "idle") return;
+    if (device.brand === "Other") { setStatus("missing"); return; }
+    setStatus("loading");
+    controller.current = new AbortController();
+    const timeout = window.setTimeout(() => controller.current?.abort(), 8000);
+    try {
+      const params = new URLSearchParams({ brand: device.brand, model: device.model });
+      const response = await fetch(`/api/device-model?${params}`, { signal: controller.current.signal });
+      if (!response.ok) throw new Error("Preview unavailable");
+      const result: unknown = await response.json();
+      if (!result || typeof result !== "object" || !("sketchfabId" in result) || typeof result.sketchfabId !== "string" || !/^[a-f0-9]{32}$/.test(result.sketchfabId)) throw new Error("Invalid preview");
+      setModel(result as ThreeDModel);
+      setStatus("ready");
+    } catch { setStatus("missing"); }
+    finally { window.clearTimeout(timeout); }
+  }
 
   return (
-    <section className="device-verifier" aria-live="polite">
-      <div className="verifier-copy">
-        <p className="verifier-kicker"><span>{device.brand}</span> · {device.family}</p>
-        <h3>{device.model}</h3>
-        {usesCellzyDuoModel ? (
-          <>
-            <p>Model preview is temporarily unavailable while we keep this catalog aligned with the exact repair request.</p>
-            <div className="verifier-status"><BadgeCheck /> Model inquiry saved for exact matching</div>
-          </>
-        ) : status === "ready" && model ? (
-          <>
-            <p>Rotate the phone to verify the finish, camera layout, frame and controls before you choose the repair.</p>
-            <div className="verifier-status"><BadgeCheck /> {model.label} · interactive 360°</div>
-          </>
-        ) : status === "loading" ? (
-          <>
-            <p>Finding the closest exact-name 3D model from the licensed catalog.</p>
-            <div className="verifier-status is-loading"><LoaderCircle /> Matching 3D model</div>
-          </>
-        ) : (
-          <>
-            <p>No exact-name licensed model passed our match check. We will not show you the wrong phone.</p>
-            <div className="verifier-status pending"><SearchCheck /> Exact model requested</div>
-          </>
-        )}
-        {device.aliases?.length ? <p className="model-alias">Model number: {device.aliases.join(" · ")}</p> : null}
-        <a className="verifier-inquiry" href={inquiry}>Reserve or ask about it <ArrowRight /></a>
-      </div>
-
-      <div className={model || usesCellzyDuoModel ? "model-stage is-live" : "model-stage is-searching"}>
-        {usesCellzyDuoModel ? (
-          <div className="model-lookup" role="status">
-            <span><i /><i /><i /></span>
-            <strong>Model viewer is temporarily off-line</strong>
-            <small>We still collect exact repair details for this model.</small>
+    <section className="device-verifier" aria-label="Optional device preview">
+      <button type="button" className="preview-toggle" aria-expanded={open} aria-controls="device-preview" onClick={toggle}><span><RotateCw /><span>Want a closer look?<small>Check for a 360° view of your model.</small></span></span><ChevronDown /></button>
+      {open && <div id="device-preview" className="preview-content">
+        {status === "loading" ? <p className="preview-message" role="status"><LoaderCircle className="loading-spinner" />Looking for a preview of {device.model}…</p> : model ? <>
+          <div className="model-stage">
+            {!viewerLoaded && <p className="viewer-loading" role="status">{viewerSlow ? "Taking a little longer. You can open the model below or continue your repair." : "Loading the interactive view…"}</p>}
+            <iframe title={`360 degree reference of ${device.model}`} src={`https://sketchfab.com/models/${model.sketchfabId}/embed?autostart=1&ui_theme=dark&ui_infos=0&ui_hint=0&ui_inspector=0&scrollwheel=0`} allow="fullscreen; xr-spatial-tracking" allowFullScreen onLoad={() => setViewerLoaded(true)} />
           </div>
-        ) : model ? (
-          <>
-            <iframe
-              key={model.sketchfabId}
-              title={`Interactive 360 degree model of ${device.model}`}
-              src={`https://sketchfab.com/models/${model.sketchfabId}/embed?autostart=1&ui_theme=dark&ui_infos=0&ui_hint=0&ui_controls=0&ui_inspector=0&autospin=.15`}
-              loading="lazy"
-              allow="autoplay; fullscreen; xr-spatial-tracking"
-              allowFullScreen
-            />
-            <div className="model-instruction"><RotateCw /> Drag to rotate · scroll to zoom</div>
-            <a className="model-credit" href={model.source} target="_blank" rel="noreferrer">3D by {model.creator} · CC licensed <ExternalLink /></a>
-          </>
-        ) : (
-          <div className="model-lookup" role="status">
-            <span><i /><i /><i /></span>
-            <strong>{status === "loading" ? "Matching the exact device" : "Exact model not found"}</strong>
-            <small>{status === "loading" ? "Checking name, generation and variant" : "Cellzy has recorded this model request"}</small>
-          </div>
-        )}
-      </div>
-      <p className="verifier-disclaimer">Visual reference only. Colours and finishes can vary; trademarks belong to their respective owners.</p>
+          <div className="preview-footer"><p>Drag to rotate. Community visual reference; finishes may vary.</p><a href={model.source} target="_blank" rel="noreferrer">Open 3D reference <ExternalLink /></a></div>
+          <p className="preview-credit">Model by {model.creator}. Your repair request uses the phone you selected above.</p>
+        </> : <p className="preview-message" role="status">A matching 360° preview isn’t available for {device.model}. You can still choose any repair above; we’ll confirm your model before work begins.</p>}
+      </div>}
     </section>
   );
 }
