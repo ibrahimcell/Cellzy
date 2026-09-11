@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight, BadgeCheck, ExternalLink, LoaderCircle, RotateCw, SearchCheck } from "lucide-react";
+import { DuoModel } from "@/components/duo-model";
 import type { Device, ThreeDModel } from "@/lib/devices";
 
 type LookupModel = ThreeDModel & { matchedName?: string };
 
 export function DeviceVerifier({ device }: { device?: Device }) {
+  const duoProgressRef = useRef(0.5);
   const [model, setModel] = useState<LookupModel | undefined>(device?.threeD);
   const [status, setStatus] = useState<"ready" | "loading" | "missing">(device?.threeD ? "ready" : "loading");
 
@@ -32,6 +34,7 @@ export function DeviceVerifier({ device }: { device?: Device }) {
   }, [device]);
 
   if (!device) return null;
+  const usesCellzyDuoModel = device.model === "iPhone Duo";
   const inquiry = `mailto:info@cellzy.com?subject=${encodeURIComponent(`Device inquiry — ${device.model}`)}&body=${encodeURIComponent(`Hi Cellzy, I'd like to reserve or ask about a ${device.model}.`)}`;
 
   return (
@@ -39,9 +42,14 @@ export function DeviceVerifier({ device }: { device?: Device }) {
       <div className="verifier-copy">
         <p className="verifier-kicker"><span>{device.brand}</span> · {device.family}</p>
         <h3>{device.model}</h3>
-        {status === "ready" && model ? (
+        {usesCellzyDuoModel ? (
           <>
-            <p>Inspect the finish, camera layout, frame and controls from every angle before you book.</p>
+            <p>Open the hinge, then drag the phone to verify the frame, cameras and controls before choosing the repair.</p>
+            <div className="verifier-status"><BadgeCheck /> Cellzy product model · interactive 3D</div>
+          </>
+        ) : status === "ready" && model ? (
+          <>
+            <p>Rotate the phone to verify the finish, camera layout, frame and controls before you choose the repair.</p>
             <div className="verifier-status"><BadgeCheck /> {model.label} · interactive 360°</div>
           </>
         ) : status === "loading" ? (
@@ -59,8 +67,13 @@ export function DeviceVerifier({ device }: { device?: Device }) {
         <a className="verifier-inquiry" href={inquiry}>Reserve or ask about it <ArrowRight /></a>
       </div>
 
-      <div className={model ? "model-stage is-live" : "model-stage is-searching"}>
-        {model ? (
+      <div className={model || usesCellzyDuoModel ? "model-stage is-live" : "model-stage is-searching"}>
+        {usesCellzyDuoModel ? (
+          <>
+            <DuoModel progressRef={duoProgressRef} interactive />
+            <div className="model-instruction"><RotateCw /> Drag to rotate · inspect every side</div>
+          </>
+        ) : model ? (
           <>
             <iframe
               key={model.sketchfabId}

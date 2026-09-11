@@ -2,10 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { ArrowDown, ArrowRight, BatteryCharging, Cable, Clock3, Headphones, Menu, RotateCw, Search, ShieldCheck, Smartphone, Sparkles, Wrench, X } from "lucide-react";
+import { ArrowRight, BatteryCharging, Cable, Check, Headphones, Menu, RotateCw, Search, ShieldCheck, Smartphone, Sparkles, Wrench, X } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { BookingFlow } from "@/components/booking-flow";
 import { DeviceVerifier } from "@/components/device-verifier";
+import { ProductStory } from "@/components/product-story";
 import { deviceBrands, devices, featuredModels, matchesDevice } from "@/lib/devices";
 
 const categories = [
@@ -17,11 +18,41 @@ const categories = [
   { icon: Sparkles, title: "More in store", copy: "PopSockets, tablet accessories, smart-watch add-ons and new arrivals." },
 ];
 
+const repairIssues = [
+  { id: "cracked-screen", title: "Cracked screen", copy: "Cracks, touch issues or display damage", image: "/assets/issues/cracked-screen.jpg" },
+  { id: "back-glass", title: "Broken back glass", copy: "Cracked or shattered rear panel", image: "/assets/issues/back-glass.jpg" },
+  { id: "battery", title: "Battery problem", copy: "Fast drain, swelling or unexpected shutdowns", image: "/assets/issues/battery.jpg" },
+  { id: "charging-port", title: "Not charging", copy: "Loose cable, blocked port or no power", image: "/assets/issues/charging-port.jpg" },
+  { id: "speaker-microphone", title: "Speaker or microphone", copy: "Low sound, distortion or call issues", image: "/assets/issues/speaker-microphone.jpg" },
+  { id: "camera", title: "Camera problem", copy: "Cracked lens, blur or camera failure", image: "/assets/issues/camera.jpg" },
+  { id: "water-damage", title: "Water damage", copy: "Moisture, spills or liquid exposure", image: "/assets/issues/water-damage.jpg" },
+  { id: "software-other", title: "Software or other", copy: "Frozen screen, boot issues or something else", image: "/assets/issues/software-other.jpg" },
+] as const;
+
+type RepairIssue = (typeof repairIssues)[number];
+
+function repairReservationLink(device: string, issue: RepairIssue) {
+  const subject = `Repair reservation — ${device} — ${issue.title}`;
+  const body = [
+    "Hi Cellzy,",
+    "",
+    "I'd like to reserve a repair.",
+    `Device: ${device}`,
+    `Issue: ${issue.title}`,
+    "",
+    "Additional details:",
+    "",
+    "Please contact me to confirm a time.",
+  ].join("\n");
+  return `mailto:info@cellzy.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [catalogQuery, setCatalogQuery] = useState("");
   const [selectedBrand, setSelectedBrand] = useState("All");
   const [previewModel, setPreviewModel] = useState("");
+  const [issueSelection, setIssueSelection] = useState<{ deviceKey: string; issue: RepairIssue } | null>(null);
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add("is-visible")), { threshold: .15 });
     document.querySelectorAll("[data-reveal]").forEach((element) => observer.observe(element));
@@ -42,9 +73,14 @@ export default function Home() {
     return selected ?? matches[0];
   }, [matches, previewModel]);
 
+  const previewDeviceKey = previewDevice ? `${previewDevice.brand}-${previewDevice.model}` : "";
+  const selectedIssue = issueSelection?.deviceKey === previewDeviceKey ? issueSelection.issue : null;
+
+  const exactDeviceSelected = Boolean(catalogQuery.trim() && matches.length === 1 && previewDevice);
+
   return (
     <main>
-      <header className="site-header">
+      <header className="site-header cinematic-header">
         <a href="#top" aria-label="Cellzy home" className="logo-link"><Image src="/assets/cellzy-logo.png" alt="Cellzy" className="wordmark" width={340} height={120} priority /></a>
         <nav aria-label="Main navigation" className="desktop-nav">
           <a href="#repairs">Repairs</a><a href="#devices">Devices</a><a href="#accessories">Accessories</a><a href="#visit">Visit</a>
@@ -59,20 +95,7 @@ export default function Home() {
         <nav><a onClick={() => setMenuOpen(false)} href="#repairs">Repairs</a><a onClick={() => setMenuOpen(false)} href="#devices">Devices</a><a onClick={() => setMenuOpen(false)} href="#accessories">Accessories</a><a onClick={() => setMenuOpen(false)} href="#visit">Visit</a></nav>
       </div>
 
-      <section className="hero" id="top">
-        <div className="hero-copy">
-          <p className="eyebrow reveal reveal-one">Phones · accessories · repairs</p>
-          <h1 className="reveal reveal-two">Your phone,<span>back to perfect.</span></h1>
-          <p className="hero-intro reveal reveal-three">Most repairs finished in about 30 minutes. Every model, every day, with screen options that fit how you use your phone.</p>
-          <div className="hero-actions reveal reveal-four"><BookingDialog triggerClass="primary-button" label="Start your repair" icon webMcp /><a className="text-button" href="#devices">Browse devices</a></div>
-          <div className="hero-proof reveal reveal-five"><span><Clock3 /> 30-minute repairs</span><span><ShieldCheck /> Three screen grades</span></div>
-        </div>
-        <div className="hero-visual" aria-hidden="true">
-          <div className="hero-image-wrap"><Image src="/assets/hero-device.jpg" alt="" className="hero-image" fill sizes="(max-width: 900px) 100vw, 50vw" priority /><div className="hero-glass-card"><span className="pulse-dot" /><div><strong>Repair bench open</strong><small>Walk in or reserve a time</small></div></div></div>
-          <span className="hero-index">01 / Care</span>
-        </div>
-        <a className="scroll-cue" href="#repairs"><span>Explore</span><ArrowDown /></a>
-      </section>
+      <ProductStory />
 
       <section className="repair-ribbon"><span>LCD</span><i /><span>OLED</span><i /><span>Original</span><i /><span>Most repairs in 30 minutes</span></section>
 
@@ -86,22 +109,26 @@ export default function Home() {
         <div className="repair-cta" data-reveal><div><Wrench /><span><strong>Cracked screen to finished phone</strong><small>Most standard repairs take about 30 minutes.</small></span></div><BookingDialog triggerClass="primary-button" label="Reserve a repair" icon /></div>
       </section>
 
-      <section className="store-story" aria-label="Cellzy store concept">
-        <div className="store-photo" data-reveal><Image src="/assets/store-interior.jpg" alt="Cellzy store interior concept with phone case displays and repair counter" fill sizes="(max-width: 900px) 100vw, 65vw" /></div>
-        <div className="store-copy" data-reveal><p className="eyebrow">Designed around your device</p><h2>See it. Feel it. Find the right fit.</h2><p>Our stores bring hundreds of cases, accessories and repair options together in one bright, easy-to-shop space.</p><a href="#visit">Explore the store <ArrowRight /></a></div>
+      <section className="campaign-break" aria-label="Cellzy campaign">
+        <div className="campaign-photo" data-reveal><Image src="/assets/brand/campaign-city.jpg" alt="Cellzy customer with her phone in the city" fill sizes="(max-width: 900px) 100vw, 56vw" /></div>
+        <div className="campaign-copy" data-reveal><p className="eyebrow">Made for real life</p><h2>Every device.<br />Your kind of care.</h2><p>From the newest iPhone Duo and iPhone 18 Pro Max to the phone already in your pocket. Cellzy keeps the technology personal.</p><a href="#devices">Find your phone <ArrowRight /></a></div>
       </section>
 
       <section className="device-section" id="devices">
-        <div className="section-heading compact" data-reveal><p className="eyebrow">Device directory</p><h2>Find your exact phone.</h2><p>Search {devices.length} phones by name or model number. Inspect supported models in 360°, then reserve a device or repair—no online checkout.</p></div>
+        <div className="section-heading compact" data-reveal><p className="eyebrow">Device directory</p><h2>Find your exact phone.</h2><p>Search {devices.length} phones by name or model number. Rotate supported models in 360°, choose the problem, then reserve your repair—no online checkout.</p></div>
         <div className="device-finder" data-reveal>
-          <label><Search /><span className="sr-only">Search devices</span><input value={catalogQuery} onChange={(event) => setCatalogQuery(event.target.value)} placeholder="Search iPhone, Galaxy, Pixel, Motorola…" /></label>
+          <label><Search /><span className="sr-only">Search devices</span><input value={catalogQuery} onChange={(event) => { setCatalogQuery(event.target.value); setPreviewModel(""); }} placeholder="Search iPhone, Galaxy, Pixel, Motorola…" /></label>
           <div className="brand-filters" aria-label="Filter devices by brand">
             {["All", ...deviceBrands].map((brand) => <button type="button" key={brand} className={selectedBrand === brand ? "active" : ""} onClick={() => { setSelectedBrand(brand); setPreviewModel(""); }}>{brand}</button>)}
           </div>
           {previewDevice ? <DeviceVerifier key={`${previewDevice.brand}-${previewDevice.model}`} device={previewDevice} /> : null}
-          <div className="device-results">
-            {matches.length ? matches.map((item) => item && <article className={previewDevice?.model === item.model ? "selected-device" : ""} key={`${item.brand}-${item.model}`}><div className="device-card-top"><small>{item.brand} · {item.family}</small><span><RotateCw /> 360°</span></div><h3>{item.model}</h3>{item.aliases?.length ? <p>Also found as {item.aliases.join(" · ")}</p> : <p>Screen · battery · charging · more</p>}<div className="device-card-actions"><button type="button" onClick={() => setPreviewModel(item.model)}>View in 360°</button><a href={`mailto:info@cellzy.com?subject=${encodeURIComponent(`Device reservation — ${item.model}`)}&body=${encodeURIComponent(`Hi Cellzy, I'd like to reserve or ask about a ${item.model}.`)}`}>Reserve <ArrowRight /></a></div></article>) : <article className="no-result"><h3>We can still help.</h3><p>Email the exact model number and we’ll check the repair or device options.</p><a href={`mailto:info@cellzy.com?subject=${encodeURIComponent(`Device inquiry — ${catalogQuery}`)}`}>Ask about this device <ArrowRight /></a></article>}
-          </div>
+          {exactDeviceSelected && previewDevice ? (
+            <RepairIssueSelector device={previewDevice.model} selectedIssue={selectedIssue} onSelect={(issue) => setIssueSelection({ deviceKey: previewDeviceKey, issue })} />
+          ) : (
+            <div className="device-results">
+              {matches.length ? matches.map((item) => item && <article key={`${item.brand}-${item.model}`}><div className="device-card-top"><small>{item.brand} · {item.family}</small><span><RotateCw /> 360°</span></div><h3>{item.model}</h3>{item.aliases?.length ? <p>Also found as {item.aliases.join(" · ")}</p> : <p>Screen · battery · charging · more</p>}<div className="device-card-actions"><button type="button" onClick={() => { setCatalogQuery(item.model); setPreviewModel(item.model); }}>Choose this model <ArrowRight /></button></div></article>) : <article className="no-result"><h3>We can still help.</h3><p>Email the exact model number and we’ll check the repair or device options.</p><a href={`mailto:info@cellzy.com?subject=${encodeURIComponent(`Device inquiry — ${catalogQuery}`)}`}>Ask about this device <ArrowRight /></a></article>}
+            </div>
+          )}
         </div>
       </section>
 
@@ -112,13 +139,79 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="visit-section" id="visit">
-        <div className="visit-copy" data-reveal><p className="eyebrow">Talk to Cellzy</p><h2>Walk in.<br />Walk out connected.</h2><p>Repairs, devices and accessories—all with real help from people who know phones.</p><div className="contact-list"><a href="mailto:info@cellzy.com">info@cellzy.com</a><span>Phone and opening hours coming soon</span></div></div>
-        <div className="visit-image" data-reveal><Image src="/assets/store-facade.jpg" alt="Cellzy storefront concept" fill sizes="(max-width: 900px) 100vw, 62vw" /></div>
+      <section className="brand-world" id="visit">
+        <div className="brand-world-heading" data-reveal>
+          <p className="eyebrow">The Cellzy world</p>
+          <h2>Designed online.<br />Built to feel real.</h2>
+          <p>Warm wood, brushed metal, terrazzo and terracotta—the physical Cellzy spaces and the digital experience now speak the same language.</p>
+        </div>
+        <div className="store-cinema" data-reveal>
+          <Image src="/assets/brand/store-overall.jpg" alt="Cellzy in-line store interior with circular displays and illuminated ceiling rings" fill sizes="100vw" />
+          <span>In-line store · overall view</span>
+        </div>
+        <div className="store-filmstrip">
+          {[
+            ["/assets/brand/store-left.jpg", "In-line store left view"],
+            ["/assets/brand/store-right.jpg", "In-line store right view"],
+            ["/assets/brand/store-facade.jpg", "Cellzy storefront"],
+            ["/assets/brand/kiosk-front.jpg", "Cellzy kiosk front view"],
+            ["/assets/brand/kiosk-left.jpg", "Cellzy kiosk left view"],
+            ["/assets/brand/kiosk-right.jpg", "Cellzy kiosk right view"],
+          ].map(([src, alt]) => <figure key={src}><Image src={src} alt={alt} fill sizes="(max-width: 700px) 88vw, 48vw" /><figcaption>{alt}</figcaption></figure>)}
+        </div>
+        <div className="people-collage">
+          {[
+            ["/assets/brand/campaign-float.jpg", "Phone floating above a hand"],
+            ["/assets/brand/campaign-black.jpg", "Customer holding a phone"],
+            ["/assets/brand/campaign-friends.jpg", "Friends taking photos together"],
+            ["/assets/brand/campaign-camera.jpg", "Customer using a phone camera"],
+            ["/assets/brand/campaign-call.jpg", "Customer taking a call"],
+            ["/assets/brand/campaign-case.jpg", "Customer using a phone case"],
+            ["/assets/brand/campaign-cafe.jpg", "Customer using a phone at a cafe"],
+          ].map(([src, alt], index) => <figure key={src} className={`collage-item collage-item-${index + 1}`} data-reveal><Image src={src} alt={alt} fill sizes="(max-width: 700px) 50vw, 28vw" /></figure>)}
+        </div>
+        <div className="visit-callout" data-reveal>
+          <div><p className="eyebrow">Talk to Cellzy</p><h2>Walk in.<br />Walk out connected.</h2></div>
+          <div><p>Repairs, devices and accessories—with real help from people who know phones.</p><a href="mailto:info@cellzy.com">info@cellzy.com <ArrowRight /></a><span>Phone, address and opening hours coming soon</span></div>
+        </div>
       </section>
 
-      <footer><a href="#top"><Image src="/assets/cellzy-logo.png" alt="Cellzy" className="wordmark" width={340} height={120} /></a><p>Phones · accessories · repairs</p><a href="mailto:info@cellzy.com">info@cellzy.com</a><small>© 2026 Cellzy. All rights reserved.</small></footer>
+      <footer><a href="#top"><Image src="/assets/cellzy-logo.png" alt="Cellzy" className="wordmark" width={340} height={120} /></a><p>Phones · accessories · repairs</p><a href="mailto:info@cellzy.com">info@cellzy.com</a><small>© 2026 Cellzy. Apple and iPhone are trademarks of Apple Inc.</small></footer>
     </main>
+  );
+}
+
+function RepairIssueSelector({ device, selectedIssue, onSelect }: { device: string; selectedIssue: RepairIssue | null; onSelect: (issue: RepairIssue) => void }) {
+  return (
+    <section className="repair-issue-selector" aria-labelledby="repair-issue-heading">
+      <div className="issue-heading">
+        <div>
+          <p className="eyebrow">Your {device}</p>
+          <h3 id="repair-issue-heading">What needs attention?</h3>
+        </div>
+        <p>Choose the closest issue. You can add more details in the email.</p>
+      </div>
+      <div className="issue-grid">
+        {repairIssues.map((issue) => {
+          const selected = selectedIssue?.id === issue.id;
+          return (
+            <button key={issue.id} type="button" className={selected ? "issue-card is-selected" : "issue-card"} aria-pressed={selected} onClick={() => onSelect(issue)}>
+              <Image src={issue.image} alt="" fill sizes="(max-width: 560px) 50vw, (max-width: 900px) 33vw, 25vw" />
+              <span className="issue-shade" />
+              <span className="issue-check" aria-hidden="true"><Check /></span>
+              <span className="issue-copy"><strong>{issue.title}</strong><small>{issue.copy}</small></span>
+            </button>
+          );
+        })}
+      </div>
+      <div className="issue-reserve-bar" aria-live="polite">
+        <div>
+          <small>Selected repair</small>
+          <strong>{selectedIssue ? `${device} · ${selectedIssue.title}` : "Choose an issue above"}</strong>
+        </div>
+        {selectedIssue ? <a className="primary-button" href={repairReservationLink(device, selectedIssue)}>Reserve this repair <ArrowRight /></a> : <button className="primary-button" type="button" disabled>Reserve this repair <ArrowRight /></button>}
+      </div>
+    </section>
   );
 }
 
