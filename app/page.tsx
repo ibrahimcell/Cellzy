@@ -5,7 +5,6 @@ import Image from "next/image";
 import { ArrowLeft, ArrowRight, BatteryCharging, Cable, Check, Clock3, Headphones, Menu, Search, ShieldCheck, Smartphone, Sparkles, Wrench, X } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { BookingFlow } from "@/components/booking-flow";
-import { DeviceVerifier } from "@/components/device-verifier";
 import { ProductStory } from "@/components/product-story";
 import { deviceBrands, devices, featuredModels, matchesDevice, type Device } from "@/lib/devices";
 import { inquiryLink, repairIssues, type RepairIssue } from "@/lib/repairs";
@@ -92,7 +91,6 @@ export default function Home() {
               <div className="device-selection">
                 <div className="selected-device-bar"><div><span className="selection-check"><Check /></span><div><p>{selectedDevice.brand === "Other" ? "Your device" : selectedDevice.brand}</p><h3>{selectedDevice.model}</h3></div></div><button type="button" className="text-link" onClick={resetSelection}>Change device</button></div>
                 <RepairIssueSelector device={selectedDevice.model} selectedIssue={selectedIssue} onSelect={setSelectedIssue} onReserve={openBooking} />
-                <DeviceVerifier key={`${selectedDevice.brand}-${selectedDevice.model}`} device={selectedDevice} />
                 <div className="device-purchase"><p>Looking to buy this phone?</p><a className="text-link" href={inquiryLink(`Device reservation — ${selectedDevice.model}`, [`I'd like to buy or reserve a ${selectedDevice.model}.`, "Preferred storage and colour:"])}>Ask about price & availability <ArrowRight /></a></div>
               </div>
             ) : (

@@ -17,9 +17,9 @@ No message is automatically sent. The customer sends it through their own email 
 
 Accessories and phone purchases also use inquiry/reservation emails.
 
-## Device previews
+## Device selection
 
-3D is optional and loads only when requested. Curated references are in `lib/devices.ts`; other catalog models use a bounded Sketchfab lookup with variant and license checks. Some phones have no matching 3D reference. A preview failure never blocks repair selection or booking. Third-party previews are visual references, not an inventory source.
+Customers identify their device through name/model-number search. The 360° viewer is not displayed; selecting a model leads directly to the illustrated repair choices and reservation flow.
 
 ## Content still needed
 
