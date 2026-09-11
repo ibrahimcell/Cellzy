@@ -39,6 +39,7 @@ function repairReservationLink(device: string, issue: RepairIssue) {
     "I'd like to reserve a repair.",
     `Device: ${device}`,
     `Issue: ${issue.title}`,
+    "Please share a price estimate and available appointment options.",
     "",
     "Additional details:",
     "",
@@ -75,8 +76,9 @@ export default function Home() {
 
   const previewDeviceKey = previewDevice ? `${previewDevice.brand}-${previewDevice.model}` : "";
   const selectedIssue = issueSelection?.deviceKey === previewDeviceKey ? issueSelection.issue : null;
-
-  const exactDeviceSelected = Boolean(catalogQuery.trim() && matches.length === 1 && previewDevice);
+  const selectedByChoice = Boolean(previewModel);
+  const exactMatchSelected = Boolean(catalogQuery.trim() && matches.length === 1);
+  const exactDeviceSelected = Boolean(previewDevice && (selectedByChoice || exactMatchSelected));
 
   return (
     <main>
