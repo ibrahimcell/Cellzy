@@ -1,103 +1,36 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { ArrowDown, ArrowRight } from "lucide-react";
-import { DuoModel } from "@/components/duo-model";
 
 const clamp = (value: number) => Math.min(1, Math.max(0, value));
-const APPLE_DUO_ANIMATION =
-  "https://www.apple.com/105/media/ca/iphone-duo/2026/9305e4b9-72d9-4c05-9381-b572adadd5e5/films/product/iphone-duo-product-tpl-ca-2026_16x9.m3u8";
 
 export function ProductStory() {
   const sectionRef = useRef<HTMLElement>(null);
   const actionRef = useRef<HTMLAnchorElement>(null);
-  const duoVideoRef = useRef<HTMLVideoElement>(null);
-  const duoDurationRef = useRef(0);
-  const duoProgressRef = useRef(0);
   const frameRef = useRef<number | null>(null);
-  const [useModelFallback, setUseModelFallback] = useState(false);
 
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
-
-    const duoVideo = duoVideoRef.current;
-    let fallbackTimer: number | null = null;
-
-    const enableFallback = () => {
-      setUseModelFallback((prev) => {
-        if (prev) return prev;
-        return true;
-      });
-    };
-
-    const setDuration = () => {
-      if (!duoVideo) return;
-      if (!Number.isNaN(duoVideo.duration) && Number.isFinite(duoVideo.duration)) {
-        duoDurationRef.current = duoVideo.duration;
-      }
-    };
-
-    if (duoVideo) {
-      duoVideo.preload = "auto";
-      duoVideo.muted = true;
-      duoVideo.loop = true;
-      duoVideo.playsInline = true;
-
-      const canPlayM3U8 =
-        duoVideo.canPlayType("application/vnd.apple.mpegurl") ||
-        duoVideo.canPlayType("application/x-mpegURL") ||
-        duoVideo.canPlayType("audio/mpegurl");
-
-      if (!canPlayM3U8) {
-        enableFallback();
-      } else {
-        duoVideo.addEventListener("error", enableFallback);
-        duoVideo.addEventListener("loadedmetadata", setDuration);
-        duoVideo.addEventListener("canplay", setDuration);
-
-        if (duoVideo.readyState >= 1) {
-          setDuration();
-        }
-
-        fallbackTimer = window.setTimeout(() => {
-          if (!duoDurationRef.current) {
-            enableFallback();
-          }
-        }, 2500);
-      }
-    }
 
     const update = () => {
       frameRef.current = null;
       const bounds = section.getBoundingClientRect();
       const travel = Math.max(1, section.offsetHeight - window.innerHeight);
       const progress = clamp(-bounds.top / travel);
-      const duoOpacity = 1 - clamp((progress - 0.34) / 0.12);
-      const proOpacity = clamp((progress - 0.39) / 0.13);
-      const proCopy = clamp((progress - 0.48) / 0.11);
-      const duoProgress = clamp(progress / 0.31);
-      duoProgressRef.current = duoProgress;
+      const proOpacity = clamp(0.2 + progress * 1.2);
+      const proCopy = clamp(progress * 1.25);
+      const storyScroll = clamp(1 - progress * 2.2);
 
-      if (!useModelFallback && duoVideo && duoDurationRef.current > 0) {
-        const time = duoProgress * (duoDurationRef.current * 0.98);
-        try {
-          duoVideo.currentTime = time;
-        } catch {
-          enableFallback();
-        }
-      }
-
-      section.style.setProperty("--story-background", proOpacity > 0.5 ? "#050505" : "#f5f5f7");
-      section.style.setProperty("--duo-opacity", `${duoOpacity}`);
-      section.style.setProperty("--duo-scale", `${1 - clamp(progress / 0.42) * 0.035}`);
+      section.style.setProperty("--story-background", "#050505");
       section.style.setProperty("--pro-opacity", `${proOpacity}`);
       section.style.setProperty("--pro-scale", `${1.035 - proOpacity * 0.035}`);
       section.style.setProperty("--pro-copy", `${proCopy}`);
       section.style.setProperty("--pro-copy-y", `${(1 - proCopy) * 20}px`);
       section.style.setProperty("--story-progress-height", `${progress * 120}px`);
-      section.style.setProperty("--story-scroll-opacity", `${Math.max(0, 1 - progress * 7)}`);
+      section.style.setProperty("--story-scroll-opacity", `${storyScroll}`);
 
       if (actionRef.current) {
         actionRef.current.tabIndex = proCopy > 0.88 ? 0 : -1;
@@ -117,49 +50,15 @@ export function ProductStory() {
     return () => {
       window.removeEventListener("scroll", requestUpdate);
       window.removeEventListener("resize", requestUpdate);
-      if (duoVideo) {
-        duoVideo.removeEventListener("error", enableFallback);
-        duoVideo.removeEventListener("loadedmetadata", setDuration);
-        duoVideo.removeEventListener("canplay", setDuration);
-      }
-      if (fallbackTimer !== null) {
-        window.clearTimeout(fallbackTimer);
-      }
       if (frameRef.current !== null) {
         window.cancelAnimationFrame(frameRef.current);
       }
     };
-  }, [useModelFallback]);
+  }, []);
 
   return (
     <section ref={sectionRef} className="product-story product-film" id="top" aria-label="Cellzy new iPhone story">
       <div className="story-sticky">
-        <section className="product-scene duo-scene" aria-label="iPhone Duo unfolds from closed to open">
-          <div className="duo-stage">
-            {!useModelFallback ? (
-              <video
-                ref={duoVideoRef}
-                className="duo-hero-video"
-                autoPlay
-                muted
-                playsInline
-                aria-label="Apple iPhone Duo product animation"
-                src={APPLE_DUO_ANIMATION}
-              >
-                <source src={APPLE_DUO_ANIMATION} type="application/x-mpegURL" />
-                <source src={APPLE_DUO_ANIMATION} type="application/vnd.apple.mpegurl" />
-              </video>
-            ) : (
-              <DuoModel progressRef={duoProgressRef} />
-            )}
-          </div>
-          <div className="film-copy duo-film-copy">
-            <span>New at Cellzy</span>
-            <h1>iPhone Duo</h1>
-            <p>Scroll to unfold.</p>
-          </div>
-        </section>
-
         <section className="product-scene pro-scene" aria-label="iPhone 18 Pro Max in burgundy">
           <Image
             className="pro-product-image"
@@ -179,7 +78,7 @@ export function ProductStory() {
           </a>
         </section>
 
-        <div className="story-progress" aria-hidden="true"><i /><span>DUO</span><span>18 PRO MAX</span></div>
+        <div className="story-progress" aria-hidden="true"><span>18 PRO MAX</span></div>
         <div className="story-scroll" aria-hidden="true"><ArrowDown /><span>Scroll</span></div>
       </div>
     </section>
