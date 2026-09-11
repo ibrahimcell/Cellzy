@@ -1,14 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight, BadgeCheck, ExternalLink, LoaderCircle, RotateCw, SearchCheck } from "lucide-react";
-import { DuoModel } from "@/components/duo-model";
 import type { Device, ThreeDModel } from "@/lib/devices";
 
 type LookupModel = ThreeDModel & { matchedName?: string };
 
 export function DeviceVerifier({ device }: { device?: Device }) {
-  const duoProgressRef = useRef(0.5);
   const [model, setModel] = useState<LookupModel | undefined>(device?.threeD);
   const [status, setStatus] = useState<"ready" | "loading" | "missing">(device?.threeD ? "ready" : "loading");
 
@@ -44,8 +42,8 @@ export function DeviceVerifier({ device }: { device?: Device }) {
         <h3>{device.model}</h3>
         {usesCellzyDuoModel ? (
           <>
-            <p>Open the hinge, then drag the phone to verify the frame, cameras and controls before choosing the repair.</p>
-            <div className="verifier-status"><BadgeCheck /> Cellzy product model · interactive 3D</div>
+            <p>Model preview is temporarily unavailable while we keep this catalog aligned with the exact repair request.</p>
+            <div className="verifier-status"><BadgeCheck /> Model inquiry saved for exact matching</div>
           </>
         ) : status === "ready" && model ? (
           <>
@@ -69,16 +67,17 @@ export function DeviceVerifier({ device }: { device?: Device }) {
 
       <div className={model || usesCellzyDuoModel ? "model-stage is-live" : "model-stage is-searching"}>
         {usesCellzyDuoModel ? (
-          <>
-            <DuoModel progressRef={duoProgressRef} interactive />
-            <div className="model-instruction"><RotateCw /> Drag to rotate · inspect every side</div>
-          </>
+          <div className="model-lookup" role="status">
+            <span><i /><i /><i /></span>
+            <strong>Model viewer is temporarily off-line</strong>
+            <small>We still collect exact repair details for this model.</small>
+          </div>
         ) : model ? (
           <>
             <iframe
               key={model.sketchfabId}
               title={`Interactive 360 degree model of ${device.model}`}
-              src={`https://sketchfab.com/models/${model.sketchfabId}/embed?autostart=1&ui_theme=dark&ui_infos=0&ui_hint=0&ui_controls=1&ui_inspector=0&autospin=.15`}
+              src={`https://sketchfab.com/models/${model.sketchfabId}/embed?autostart=1&ui_theme=dark&ui_infos=0&ui_hint=0&ui_controls=0&ui_inspector=0&autospin=.15`}
               loading="lazy"
               allow="autoplay; fullscreen; xr-spatial-tracking"
               allowFullScreen

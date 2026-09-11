@@ -55,10 +55,23 @@ export default function Home() {
   const [previewModel, setPreviewModel] = useState("");
   const [issueSelection, setIssueSelection] = useState<{ deviceKey: string; issue: RepairIssue } | null>(null);
   useEffect(() => {
+    const elements = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
     document.documentElement.classList.add("js-ready");
-    const observer = new IntersectionObserver((entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add("is-visible")), { threshold: .15 });
-    document.querySelectorAll("[data-reveal]").forEach((element) => observer.observe(element));
-    return () => observer.disconnect();
+    if (typeof IntersectionObserver !== "function") {
+      elements.forEach((element) => element.classList.add("is-visible"));
+      return undefined;
+    }
+
+    try {
+      const observer = new IntersectionObserver((entries) => entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add("is-visible");
+      }), { threshold: .15 });
+      elements.forEach((element) => observer.observe(element));
+      return () => observer.disconnect();
+    } catch {
+      elements.forEach((element) => element.classList.add("is-visible"));
+      return undefined;
+    }
   }, []);
 
   const matches = useMemo(() => {
@@ -120,16 +133,16 @@ export default function Home() {
       <section className="device-section" id="devices">
         <div className="section-heading compact" data-reveal><p className="eyebrow">Device directory</p><h2>Find your exact phone.</h2><p>Search {devices.length} phones by name or model number. Rotate supported models in 360°, choose the problem, then reserve your repair—no online checkout.</p></div>
         <div className="device-finder" data-reveal>
-          <label><Search /><span className="sr-only">Search devices</span><input value={catalogQuery} onChange={(event) => { setCatalogQuery(event.target.value); setPreviewModel(""); }} placeholder="Search iPhone, Galaxy, Pixel, Motorola…" /></label>
-          <div className="brand-filters" aria-label="Filter devices by brand">
-            {["All", ...deviceBrands].map((brand) => <button type="button" key={brand} className={selectedBrand === brand ? "active" : ""} onClick={() => { setSelectedBrand(brand); setPreviewModel(""); }}>{brand}</button>)}
+            <label><Search /><span className="sr-only">Search devices</span><input value={catalogQuery} onChange={(event) => { setCatalogQuery(event.target.value); setPreviewModel(""); setIssueSelection(null); }} placeholder="Search iPhone, Galaxy, Pixel, Motorola…" /></label>
+            <div className="brand-filters" aria-label="Filter devices by brand">
+            {["All", ...deviceBrands].map((brand) => <button type="button" key={brand} className={selectedBrand === brand ? "active" : ""} onClick={() => { setSelectedBrand(brand); setPreviewModel(""); setIssueSelection(null); }}>{brand}</button>)}
           </div>
           {previewDevice ? <DeviceVerifier key={`${previewDevice.brand}-${previewDevice.model}`} device={previewDevice} /> : null}
           {exactDeviceSelected && previewDevice ? (
             <RepairIssueSelector device={previewDevice.model} selectedIssue={selectedIssue} onSelect={(issue) => setIssueSelection({ deviceKey: previewDeviceKey, issue })} />
           ) : (
             <div className="device-results">
-              {matches.length ? matches.map((item) => item && <article key={`${item.brand}-${item.model}`}><div className="device-card-top"><small>{item.brand} · {item.family}</small><span><RotateCw /> 360°</span></div><h3>{item.model}</h3>{item.aliases?.length ? <p>Also found as {item.aliases.join(" · ")}</p> : <p>Screen · battery · charging · more</p>}<div className="device-card-actions"><button type="button" onClick={() => { setCatalogQuery(item.model); setPreviewModel(item.model); }}>Choose this model <ArrowRight /></button></div></article>) : <article className="no-result"><h3>We can still help.</h3><p>Email the exact model number and we’ll check the repair or device options.</p><a href={`mailto:info@cellzy.com?subject=${encodeURIComponent(`Device inquiry — ${catalogQuery}`)}`}>Ask about this device <ArrowRight /></a></article>}
+              {matches.length ? matches.map((item) => item && <article key={`${item.brand}-${item.model}`}><div className="device-card-top"><small>{item.brand} · {item.family}</small><span><RotateCw /> 360°</span></div><h3>{item.model}</h3>{item.aliases?.length ? <p>Also found as {item.aliases.join(" · ")}</p> : <p>Screen · battery · charging · more</p>}<div className="device-card-actions"><button type="button" onClick={() => { setCatalogQuery(item.model); setPreviewModel(item.model); setIssueSelection(null); }}>Choose this model <ArrowRight /></button></div></article>) : <article className="no-result"><h3>We can still help.</h3><p>Email the exact model number and we’ll check the repair or device options.</p><a href={`mailto:info@cellzy.com?subject=${encodeURIComponent(`Device inquiry — ${catalogQuery}`)}`}>Ask about this device <ArrowRight /></a></article>}
             </div>
           )}
         </div>
