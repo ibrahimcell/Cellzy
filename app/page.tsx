@@ -107,11 +107,6 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="product-spotlight" aria-labelledby="new-phone-title" data-scroll-scene>
-          <Image src="/assets/products/iphone-18-pro-burgundy.jpg" alt="Camera and burgundy finish of iPhone 18 Pro Max" fill sizes="100vw" data-scroll-image />
-          <div><p className="section-label">Meet the newest Pro</p><h2 id="new-phone-title">iPhone 18<br />Pro Max.</h2><p>Burgundy. A new point of view.</p><a className="light-button" href={inquiryLink("iPhone 18 Pro Max availability", ["I'm interested in the iPhone 18 Pro Max in burgundy."])}>Ask about availability <ArrowRight /></a><small>Contact us for local stock, pricing and arrival details.</small></div>
-        </section>
-
         <section className="accessory-section section-space" id="accessories" aria-labelledby="accessories-title">
           <div className="section-heading"><div><p className="section-label">A little more you</p><h2 id="accessories-title">Good company<br />for your phone.</h2></div><p>From a case you love to a charger you can count on. Discover your everyday essentials, then reserve for pickup.</p></div>
           <div className="accessory-feature" data-scroll-scene><Image src="/assets/brand/campaign-city.jpg" alt="Cellzy campaign: a woman taking a photograph with her phone" fill sizes="(max-width: 760px) 100vw, 88vw" data-scroll-image /><div><span>Style. Meet everyday life.</span><a href={inquiryLink("Phone case reservation", ["I'd like to reserve a phone case.", "Phone model:", "Preferred style and colour:"])}>Find your next case <ArrowRight /></a></div></div>
