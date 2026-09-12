@@ -8,7 +8,7 @@ import { BookingFlow } from "@/components/booking-flow";
 import { ProductStory } from "@/components/product-story";
 import { StoreGallery } from "@/components/store-gallery";
 import { deviceBrands, devices, featuredModels, matchesDevice, type Device } from "@/lib/devices";
-import { inquiryLink, repairIssues, type RepairIssue } from "@/lib/repairs";
+import { CONTACT_EMAIL, inquiryLink, repairIssues, type RepairIssue } from "@/lib/repairs";
 import { useScrollMotion } from "@/lib/use-scroll-motion";
 
 const categories = [
@@ -65,7 +65,7 @@ export default function Home() {
               <DialogDescription className="sr-only">Explore repairs, phones and accessories.</DialogDescription>
               <DialogClose className="menu-close" aria-label="Close menu"><X /></DialogClose>
               <nav aria-label="Mobile navigation">{[["#repairs", "Repairs"], ["#devices", "Devices"], ["#accessories", "Accessories"], ["#visit", "Our world"]].map(([href, title]) => <a key={href} href={href} onClick={() => setMenuOpen(false)}>{title}</a>)}</nav>
-              <a href="mailto:info@cellzy.com">info@cellzy.com</a>
+              <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
             </DialogContent>
           </Dialog>
         </div>
@@ -128,9 +128,9 @@ export default function Home() {
             ["/assets/brand/campaign-cafe.jpg", "Keeping connected at a cafe"],
           ].map(([src, alt]) => <figure key={src}><Image src={src} alt={alt} fill sizes="(max-width: 760px) 45vw, 24vw" /></figure>)}</div>
         </section>
-        <section className="visit-callout"><div><p className="section-label">We’re here to help</p><h2>Let’s talk<br />about your phone.</h2></div><div><p>A repair, an upgrade, or the perfect accessory.<br />Tell us what you’re looking for.</p><a href="mailto:info@cellzy.com">info@cellzy.com <ArrowRight /></a><button type="button" className="light-button" onClick={openBooking}>Book a repair <ArrowRight /></button></div></section>
+        <section className="visit-callout"><div><p className="section-label">We’re here to help</p><h2>Let’s talk<br />about your phone.</h2></div><div><p>A repair, an upgrade, or the perfect accessory.<br />Tell us what you’re looking for.</p><a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL} <ArrowRight /></a><button type="button" className="light-button" onClick={openBooking}>Book a repair <ArrowRight /></button></div></section>
       </main>
-      <footer><a href="#top" aria-label="Cellzy home" className="logo-link"><Image src="/assets/cellzy-wordmark.svg" alt="Cellzy" className="wordmark" width={280} height={82} /></a><p>Phones. Accessories. Repairs.</p><a href="mailto:info@cellzy.com">info@cellzy.com</a><small>© {new Date().getFullYear()} Cellzy. Product names and trademarks belong to their respective owners.</small></footer>
+      <footer><a href="#top" aria-label="Cellzy home" className="logo-link"><Image src="/assets/cellzy-wordmark.svg" alt="Cellzy" className="wordmark" width={280} height={82} /></a><p>Phones. Accessories. Repairs.</p><a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a><small>© {new Date().getFullYear()} Cellzy. Product names and trademarks belong to their respective owners.</small></footer>
       <Dialog open={Boolean(booking)} onOpenChange={(open) => { if (!open) setBooking(null); }}><DialogContent className="booking-dialog"><DialogTitle className="sr-only">Request a Cellzy repair appointment</DialogTitle><DialogDescription className="sr-only">Choose your device, repair and preferred visit. Prepare an email for Cellzy to confirm pricing and availability.</DialogDescription>{booking && <BookingFlow initialDevice={booking.device} initialIssue={booking.issue} />}</DialogContent></Dialog>
     </>
   );

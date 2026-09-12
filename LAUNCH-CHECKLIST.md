@@ -4,7 +4,7 @@
 
 - Public phone number
 - Opening hours and holiday-hour policy
-- Public email confirmed as `info@cellzy.com`
+- Public email confirmed as `info@cellzy.ca`
 
 ## Repairs
 
@@ -22,7 +22,7 @@
 
 ## Booking delivery
 
-- Booking requests currently open a prepared email addressed to `info@cellzy.com`
+- Booking requests currently open a prepared email addressed to `info@cellzy.ca`
 - Optional future calendar destination if bookings should also create calendar events
 
 ## Publishing

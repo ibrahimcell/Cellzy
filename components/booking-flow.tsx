@@ -5,7 +5,7 @@ import { format, startOfDay } from "date-fns";
 import { ArrowLeft, ArrowRight, Check, Copy, Mail, Search, Wrench } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { devices, featuredModels, matchesDevice } from "@/lib/devices";
-import { prepareRepairRequest, repairIssues } from "@/lib/repairs";
+import { CONTACT_EMAIL, prepareRepairRequest, repairIssues } from "@/lib/repairs";
 
 const grades = [
   { name: "LCD", copy: "A budget-conscious replacement." },
@@ -52,10 +52,10 @@ export function BookingFlow({ initialDevice = "", initialIssue = "" }: { initial
 
   async function copyRequest() {
     try {
-      await navigator.clipboard.writeText(`To: info@cellzy.com\nSubject: ${request.subject}\n\n${request.body}`);
-      setCopyStatus("Copied. Paste into an email to info@cellzy.com.");
+      await navigator.clipboard.writeText(`To: ${CONTACT_EMAIL}\nSubject: ${request.subject}\n\n${request.body}`);
+      setCopyStatus(`Copied. Paste into an email to ${CONTACT_EMAIL}.`);
     } catch {
-      setCopyStatus("Select and copy the message below, then email info@cellzy.com.");
+      setCopyStatus(`Select and copy the message below, then email ${CONTACT_EMAIL}.`);
     }
   }
 
@@ -63,10 +63,10 @@ export function BookingFlow({ initialDevice = "", initialIssue = "" }: { initial
     <div className="booking-prepared">
       <span className="dialog-icon"><Mail /></span>
       <h2 tabIndex={-1} ref={heading}>Your request is ready.</h2>
-      <p>Open your email app, review the message and send it to <strong>info@cellzy.com</strong>. Your appointment is requested only after you send; Cellzy will reply to confirm.</p>
+      <p>Open your email app, review the message and send it to <strong>{CONTACT_EMAIL}</strong>. Your appointment is requested only after you send; Cellzy will reply to confirm.</p>
       <div className="prepared-actions"><a className="primary-button" href={request.mailto}>Open email app <ArrowRight /></a><button type="button" className="secondary-button" onClick={copyRequest}><Copy />Copy request</button></div>
       <p role="status" className="copy-status">{copyStatus || "No email app? Copy the request into your webmail."}</p>
-      <label className="request-preview">Your message<textarea readOnly rows={12} value={`To: info@cellzy.com\nSubject: ${request.subject}\n\n${request.body}`} /></label>
+      <label className="request-preview">Your message<textarea readOnly rows={12} value={`To: ${CONTACT_EMAIL}\nSubject: ${request.subject}\n\n${request.body}`} /></label>
       <button type="button" className="back-button" onClick={() => { setPrepared(false); moveTo("visit"); }}><ArrowLeft />Edit request</button>
     </div>
   );

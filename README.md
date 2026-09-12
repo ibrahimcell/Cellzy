@@ -11,7 +11,7 @@ Production preview: `npm run start -- --port 5174` after building. Restart the p
 
 ## Customer requests
 
-The device directory supports name/model-number search and unlisted devices. Customers choose one of eight illustrated repair issues, a screen preference when applicable, and a preferred date/time. The final step prepares an email to info@cellzy.com with the selected details.
+The device directory supports name/model-number search and unlisted devices. Customers choose one of eight illustrated repair issues, a screen preference when applicable, and a preferred date/time. The final step prepares an email to info@cellzy.ca with the selected details.
 
 No message is automatically sent. The customer sends it through their own email app or copies the request into webmail. Nothing is charged, stored on the server, or marked as a confirmed appointment. Cellzy confirms pricing, parts and scheduling by email. Do not replace this with an automated email provider without approval.
 

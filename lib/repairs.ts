@@ -1,3 +1,5 @@
+export const CONTACT_EMAIL = "info@cellzy.ca";
+
 export const repairIssues = [
   { id: "cracked-screen", title: "Cracked screen", copy: "Cracks, touch issues or display damage", image: "/assets/issues/cracked-screen.jpg" },
   { id: "back-glass", title: "Broken back glass", copy: "Cracked or shattered rear panel", image: "/assets/issues/back-glass.jpg" },
@@ -13,7 +15,7 @@ export type RepairIssue = (typeof repairIssues)[number];
 
 export function inquiryLink(subject: string, lines: string[] = []) {
   const body = ["Hi Cellzy,", "", ...lines, "", "Please let me know the price and availability.", "", "Thank you."].join("\n");
-  return `mailto:info@cellzy.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  return `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
 export type RepairRequest = {
@@ -39,5 +41,5 @@ export function prepareRepairRequest(request: RepairRequest) {
     `Phone: ${request.phone || "Not provided"}`, `Additional details: ${request.notes || "None"}`,
     "", "Please confirm the price, parts and appointment time before reserving the repair.",
   ].join("\n");
-  return { subject, body, mailto: `mailto:info@cellzy.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}` };
+  return { subject, body, mailto: `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}` };
 }
