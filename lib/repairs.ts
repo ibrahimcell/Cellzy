@@ -13,9 +13,13 @@ export const repairIssues = [
 
 export type RepairIssue = (typeof repairIssues)[number];
 
-export function inquiryLink(subject: string, lines: string[] = []) {
+export function prepareInquiry(subject: string, lines: string[] = []) {
   const body = ["Hi Cellzy,", "", ...lines, "", "Please let me know the price and availability.", "", "Thank you."].join("\n");
-  return `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  return { subject, body, mailto: `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}` };
+}
+
+export function inquiryLink(subject: string, lines: string[] = []) {
+  return prepareInquiry(subject, lines).mailto;
 }
 
 export type RepairRequest = {

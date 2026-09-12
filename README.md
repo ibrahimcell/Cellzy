@@ -15,11 +15,19 @@ The device directory supports name/model-number search and unlisted devices. Cus
 
 No message is automatically sent. The customer sends it through their own email app or copies the request into webmail. Nothing is charged, stored on the server, or marked as a confirmed appointment. Cellzy confirms pricing, parts and scheduling by email. Do not replace this with an automated email provider without approval.
 
-Accessories and phone purchases also use inquiry/reservation emails.
+Accessories and phone purchases also use inquiry/reservation emails. The guided dialogs collect a phone's storage, colour, condition preference, carrier and budget, or an accessory's exact device, item, style and quantity. Customers review/copy the complete draft before sending. Choices are requests, not stock or compatibility guarantees.
 
 ## Device selection
 
 Customers identify their device through name/model-number search. The 360° viewer is not displayed; selecting a model leads directly to the illustrated repair choices and reservation flow.
+
+The directory now contains 326 phone entries, including 41 older Samsung, Motorola and LG additions verified through public model selectors. SE-generation and alternate Moto/Pixel names are search aliases, not duplicate products. See `docs/device-catalog-sources.md`. Directory presence does not promise stock or repair-part availability.
+
+## Customer information and accessory references
+
+`components/customer-help.tsx` contains eight original Cellzy FAQs, a request/send/confirmation explanation and a no-passwords-in-email reminder. Content reflects the owner's service brief and the implemented request flow, not a competitor's prices, warranties or certifications.
+
+The accessory section keeps Cellzy's campaign photography and adds three product-only category reference images. These are explicitly labelled as example styles, not live inventory. Source and permission status: `public/assets/accessories/PROVENANCE.md`. The reference site review did not import customer information, store details, reviews, financing, partner claims or additional repair services. New reference photos need appropriate reuse permission before commercial publication.
 
 ## Content still needed
 

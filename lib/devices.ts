@@ -79,11 +79,13 @@ const galaxyNote = series("Samsung", "Galaxy Note", [
 ]);
 
 const galaxyA = series("Samsung", "Galaxy A", [
-  "Galaxy A03", "Galaxy A03s", "Galaxy A04", "Galaxy A04s", "Galaxy A05", "Galaxy A05s",
-  "Galaxy A10", "Galaxy A11", "Galaxy A12", "Galaxy A13", "Galaxy A14", "Galaxy A15", "Galaxy A16",
+  "Galaxy A01", "Galaxy A02", "Galaxy A02s", "Galaxy A03", "Galaxy A03 Core", "Galaxy A03s",
+  "Galaxy A04", "Galaxy A04e", "Galaxy A04s", "Galaxy A05", "Galaxy A05s", "Galaxy A06",
+  "Galaxy A10", "Galaxy A10e", "Galaxy A10s", "Galaxy A11", "Galaxy A12", "Galaxy A13", "Galaxy A14", "Galaxy A15", "Galaxy A16",
   "Galaxy A20", "Galaxy A21", "Galaxy A21s", "Galaxy A22", "Galaxy A23", "Galaxy A24", "Galaxy A25", "Galaxy A26",
   "Galaxy A30", "Galaxy A31", "Galaxy A32", "Galaxy A33", "Galaxy A34", "Galaxy A35", "Galaxy A36",
-  "Galaxy A42 5G", "Galaxy A50", "Galaxy A51", "Galaxy A52", "Galaxy A53", "Galaxy A54", "Galaxy A55", "Galaxy A56",
+  "Galaxy A40", "Galaxy A40s", "Galaxy A41", "Galaxy A42 5G",
+  "Galaxy A50", "Galaxy A50s", "Galaxy A51", "Galaxy A52", "Galaxy A52s 5G", "Galaxy A53", "Galaxy A54", "Galaxy A55", "Galaxy A56", "Galaxy A60",
   "Galaxy A70", "Galaxy A71", "Galaxy A72", "Galaxy A73 5G",
 ]);
 
@@ -112,6 +114,12 @@ const motorola = [
     "Motorola Edge", "Motorola Edge+", "Motorola Edge 20", "Motorola Edge 20 Pro", "Motorola Edge 30", "Motorola Edge 30 Pro",
     "Motorola Edge 40", "Motorola Edge 40 Pro", "Motorola Edge 50 Fusion", "Motorola Edge 50 Pro", "Motorola Edge 50 Ultra",
   ]),
+  ...series("Motorola", "Moto Z", [
+    "Moto Z Force Droid", "Moto Z Play Droid", "Moto Z2 Force", "Moto Z2 Play", "Moto Z3", "Moto Z3 Play", "Moto Z4",
+  ]),
+  ...series("Motorola", "Motorola One", [
+    "Motorola One", "Motorola One Action", "Motorola One 5G Ace", "Motorola One Vision",
+  ]),
 ];
 
 const onePlus = series("OnePlus", "OnePlus", [
@@ -122,7 +130,14 @@ const onePlus = series("OnePlus", "OnePlus", [
 ]);
 
 const lg = [
-  ...series("LG", "LG G", ["LG G5", "LG G6", "LG G7 ThinQ", "LG G8 ThinQ"]),
+  ...series("LG", "LG G", [
+    "LG G2", "LG G3", "LG G4", "LG G5", "LG G6", "LG G7 ThinQ", "LG G7 One",
+    "LG G8 ThinQ", "LG G8S ThinQ", "LG G8X ThinQ",
+  ]),
+  ...series("LG", "LG Stylo", [
+    "LG Stylo", "LG Stylo 2", "LG Stylo 2 Plus", "LG Stylo 3", "LG Stylo 3 Plus",
+    "LG Stylo 4", "LG Stylo 4 Plus", "LG Stylo 5", "LG Stylo 5 Plus", "LG Stylo 6",
+  ]),
   ...series("LG", "LG V", ["LG V20", "LG V30", "LG V35 ThinQ", "LG V40 ThinQ", "LG V50 ThinQ", "LG V60 ThinQ"]),
   ...series("LG", "LG Velvet", ["LG Velvet", "LG Velvet 5G"]),
   ...series("LG", "LG Wing", ["LG Wing 5G"]),
@@ -192,8 +207,25 @@ const threeDModels: Record<string, NonNullable<Device["threeD"]>> = {
   },
 };
 
+// Search-only alternative names. Keep one canonical device entry for each phone;
+// do not turn spelling/network shorthand into duplicate models or stock claims.
+// Public name sources and exclusions: docs/device-catalog-sources.md.
+const searchAliases: Record<string, string[]> = {
+  "Apple::iPhone SE (1st gen)": ["iPhone SE 1", "iPhone SE first generation"],
+  "Apple::iPhone SE (2nd gen)": ["iPhone SE 2", "iPhone SE second generation", "iPhone SE 2020"],
+  "Apple::iPhone SE (3rd gen)": ["iPhone SE 3", "iPhone SE third generation", "iPhone SE 2022"],
+  "Google::Pixel 5a": ["Pixel 5a 5G"],
+  "Motorola::Motorola Edge": ["Moto Edge"],
+  "Motorola::Motorola Edge 20": ["Moto Edge 20"],
+  "Motorola::Motorola One": ["Moto One"],
+  "Motorola::Motorola One Action": ["Moto One Action"],
+  "Motorola::Motorola One 5G Ace": ["Moto One 5G Ace"],
+  "Motorola::Motorola One Vision": ["Moto One Vision"],
+};
+
 export const devices = rawDevices.map((device) => ({
   ...device,
+  aliases: [...(device.aliases ?? []), ...(searchAliases[`${device.brand}::${device.model}`] ?? [])],
   threeD: threeDModels[`${device.brand}::${device.model}`],
 }));
 
@@ -201,6 +233,12 @@ export const deviceBrands = ["Apple", "Samsung", "Google", "Motorola", "OnePlus"
 
 export function matchesDevice(device: Device, query: string) {
   const normalize = (value: string) => value.toLowerCase().replace(/\+/g, "plus").replace(/[^a-z0-9]/g, "");
+  // Keep short generation queries distinct from the SE's 2020/2022 year aliases.
+  const seGeneration = normalize(query).match(/^(?:apple)?(?:iphone)?se([123])$/)?.[1];
+  if (seGeneration) {
+    const generationName = ["1st", "2nd", "3rd"][Number(seGeneration) - 1];
+    return device.brand === "Apple" && device.model === `iPhone SE (${generationName} gen)`;
+  }
   const words = query.toLowerCase().trim().split(/\s+/).filter(Boolean).map(normalize);
   const haystack = normalize([device.brand, device.family, device.model, ...(device.aliases ?? [])].join(" "));
   return words.every((word) => haystack.includes(word));

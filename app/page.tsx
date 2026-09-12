@@ -2,23 +2,18 @@
 
 import { useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import { ArrowRight, BatteryCharging, Cable, Check, Clock3, Headphones, Mail, Menu, Search, ShieldCheck, Smartphone, Sparkles, Wrench, X } from "lucide-react";
+import { ArrowRight, Check, Clock3, Mail, Menu, Search, ShieldCheck, Smartphone, Sparkles, Wrench, X } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { BookingFlow } from "@/components/booking-flow";
 import { ProductStory } from "@/components/product-story";
 import { StoreGallery } from "@/components/store-gallery";
+import { AccessoryCatalog } from "@/components/accessory-catalog";
+import { CustomerHelp } from "@/components/customer-help";
+import { ShoppingInquiry } from "@/components/shopping-inquiry";
 import { deviceBrands, devices, featuredModels, matchesDevice, type Device } from "@/lib/devices";
 import { CONTACT_EMAIL, inquiryLink, repairIssues, type RepairIssue } from "@/lib/repairs";
 import { useScrollMotion } from "@/lib/use-scroll-motion";
 
-const categories = [
-  { icon: Smartphone, title: "Cases", copy: "Clear, silicone, rugged, folio. Find the fit and finish that feels like you." },
-  { icon: ShieldCheck, title: "Screen protection", copy: "Tempered glass, privacy screens, camera protectors and protective films." },
-  { icon: Cable, title: "Power", copy: "Everyday cables, fast chargers, power banks and MagSafe essentials." },
-  { icon: Headphones, title: "Audio", copy: "Earbuds, headphones and speakers. Your sound, wherever you go." },
-  { icon: BatteryCharging, title: "Car & travel", copy: "Car chargers, mounts, holders and adapters for wherever life takes you." },
-  { icon: Sparkles, title: "The little extras", copy: "PopSockets, watch bands, tablet accessories and more discoveries in store." },
-];
 const storeImages = [
   ["/assets/brand/store-left.jpg", "Inside Cellzy · left view"],
   ["/assets/brand/store-right.jpg", "Inside Cellzy · right view"],
@@ -64,7 +59,7 @@ export default function Home() {
               <DialogTitle className="sr-only">Cellzy navigation</DialogTitle>
               <DialogDescription className="sr-only">Explore repairs, phones and accessories.</DialogDescription>
               <DialogClose className="menu-close" aria-label="Close menu"><X /></DialogClose>
-              <nav aria-label="Mobile navigation">{[["#repairs", "Repairs"], ["#devices", "Devices"], ["#accessories", "Accessories"], ["#visit", "Our world"]].map(([href, title]) => <a key={href} href={href} onClick={() => setMenuOpen(false)}>{title}</a>)}</nav>
+              <nav aria-label="Mobile navigation">{[["#repairs", "Repairs"], ["#devices", "Devices"], ["#accessories", "Accessories"], ["#questions", "Questions"], ["#visit", "Our world"]].map(([href, title]) => <a key={href} href={href} onClick={() => setMenuOpen(false)}>{title}</a>)}</nav>
               <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
             </DialogContent>
           </Dialog>
@@ -94,7 +89,7 @@ export default function Home() {
               <div className="device-selection">
                 <div className="selected-device-bar"><div><span className="selection-check"><Check /></span><div><p>{selectedDevice.brand === "Other" ? "Your device" : selectedDevice.brand}</p><h3>{selectedDevice.model}</h3></div></div><button type="button" className="text-link" onClick={resetSelection}>Change device</button></div>
                 <RepairIssueSelector device={selectedDevice.model} selectedIssue={selectedIssue} onSelect={setSelectedIssue} onReserve={openBooking} />
-                <div className="device-purchase"><p>Looking to buy this phone?</p><a className="text-link" href={inquiryLink(`Device reservation — ${selectedDevice.model}`, [`I'd like to buy or reserve a ${selectedDevice.model}.`, "Preferred storage and colour:"])}>Ask about price & availability <ArrowRight /></a></div>
+                <div className="device-purchase"><p>Looking to buy this phone?</p><ShoppingInquiry kind="phone" device={selectedDevice.model}>Ask about price & availability <ArrowRight /></ShoppingInquiry><ShoppingInquiry kind="accessory" device={selectedDevice.model}>Find accessories for this model <ArrowRight /></ShoppingInquiry></div>
               </div>
             ) : (
               <>
@@ -107,11 +102,8 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="accessory-section section-space" id="accessories" aria-labelledby="accessories-title">
-          <div className="section-heading"><div><p className="section-label">A little more you</p><h2 id="accessories-title">Good company<br />for your phone.</h2></div><p>From a case you love to a charger you can count on. Discover your everyday essentials, then reserve for pickup.</p></div>
-          <div className="accessory-feature" data-scroll-scene><Image src="/assets/brand/campaign-city.jpg" alt="Cellzy campaign: a woman taking a photograph with her phone" fill sizes="(max-width: 760px) 100vw, 88vw" data-scroll-image /><div><span>Style. Meet everyday life.</span><a href={inquiryLink("Phone case reservation", ["I'd like to reserve a phone case.", "Phone model:", "Preferred style and colour:"])}>Find your next case <ArrowRight /></a></div></div>
-          <div className="category-grid">{categories.map(({ icon: Icon, title, copy }) => <article key={title}><Icon aria-hidden="true" /><h3>{title}</h3><p>{copy}</p><a className="text-link" href={inquiryLink(`${title} reservation`, [`I'd like to reserve an item from ${title}.`, "Phone model:", "Item, colour and quantity:"])}>Reserve an item <ArrowRight /></a></article>)}</div>
-        </section>
+        <AccessoryCatalog device={selectedDevice?.model} />
+        <CustomerHelp />
 
         <section className="brand-world section-space" id="visit" aria-labelledby="visit-title">
           <div className="section-heading"><div><p className="section-label">Welcome to Cellzy</p><h2 id="visit-title">Real people.<br />A fresh perspective.</h2></div><p>Come for a case. Stay for a little advice. A welcoming space for your phone and everything that goes with it.</p></div>
