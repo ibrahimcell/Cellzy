@@ -77,7 +77,7 @@ export function BookingFlow({ initialDevice = "", initialIssue = "" }: { initial
       <div className="booking-progress" aria-hidden="true"><i style={{ width: `${(index + 1) / steps.length * 100}%` }} /></div>
       {device && step !== "device" && <p className="booking-context">{device}{issue && step !== "issue" ? ` · ${issue}` : ""}</p>}
 
-      {step === "device" && <div className="booking-step">
+      {step === "device" && <div className="booking-step" key="device">
         <h2 ref={heading} tabIndex={-1}>What are we fixing?</h2>
         <p>Search a phone name or model number. You can also enter an unlisted model.</p>
         <label className="search-field"><Search aria-hidden="true" /><span className="sr-only">Search booking devices</span><input value={query} onChange={(event) => { setQuery(event.target.value); setDevice(""); setIssue(""); setGrade(""); }} placeholder="Try iPhone 13 Pro Max" maxLength={120} autoComplete="off" /></label>
@@ -87,17 +87,17 @@ export function BookingFlow({ initialDevice = "", initialIssue = "" }: { initial
         {device && <p className="selected-summary">Selected: <strong>{device}</strong></p>}
       </div>}
 
-      {step === "issue" && <div className="booking-step">
+      {step === "issue" && <div className="booking-step" key="issue">
         <h2 ref={heading} tabIndex={-1}>What happened?</h2><p>Choose the closest match. Add any other issues in the notes.</p>
         <div className="choice-grid">{repairIssues.map((item) => <button type="button" aria-pressed={issue === item.title} key={item.id} onClick={() => selectIssue(item.title)}>{item.title}{issue === item.title && <Check />}</button>)}</div>
       </div>}
 
-      {step === "screen" && <div className="booking-step">
+      {step === "screen" && <div className="booking-step" key="screen">
         <h2 ref={heading} tabIndex={-1}>Your screen preference.</h2><p>Availability and pricing depend on your model. We’ll confirm both before the repair.</p>
         <div className="grade-list">{grades.map((item) => <button type="button" aria-pressed={grade === item.name} key={item.name} onClick={() => setGrade(item.name)}><span><strong>{item.name}</strong><small>{item.copy}</small></span>{grade === item.name && <Check />}</button>)}</div>
       </div>}
 
-      {step === "visit" && <div className="booking-step">
+      {step === "visit" && <div className="booking-step" key="visit">
         <h2 ref={heading} tabIndex={-1}>When works for you?</h2><p>Choose a preferred visit. We’ll reply by email with pricing and a confirmed appointment time.</p>
         <div className="booking-final">
           <div><span className="field-label">Preferred date</span><Calendar mode="single" selected={date} onSelect={setDate} disabled={{ before: today }} startMonth={today} className="cellzy-calendar" />

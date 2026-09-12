@@ -2,12 +2,14 @@
 
 import { useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import { ArrowLeft, ArrowRight, BatteryCharging, Cable, Check, Clock3, Headphones, Menu, Search, ShieldCheck, Smartphone, Sparkles, Wrench, X } from "lucide-react";
+import { ArrowRight, BatteryCharging, Cable, Check, Clock3, Headphones, Mail, Menu, Search, ShieldCheck, Smartphone, Sparkles, Wrench, X } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { BookingFlow } from "@/components/booking-flow";
 import { ProductStory } from "@/components/product-story";
+import { StoreGallery } from "@/components/store-gallery";
 import { deviceBrands, devices, featuredModels, matchesDevice, type Device } from "@/lib/devices";
 import { inquiryLink, repairIssues, type RepairIssue } from "@/lib/repairs";
+import { useScrollMotion } from "@/lib/use-scroll-motion";
 
 const categories = [
   { icon: Smartphone, title: "Cases", copy: "Clear, silicone, rugged, folio. Find the fit and finish that feels like you." },
@@ -24,7 +26,7 @@ const storeImages = [
   ["/assets/brand/kiosk-front.jpg", "The Cellzy kiosk"],
   ["/assets/brand/kiosk-left.jpg", "Kiosk · left view"],
   ["/assets/brand/kiosk-right.jpg", "Kiosk · right view"],
-];
+] as const;
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -34,7 +36,8 @@ export default function Home() {
   const [selectedIssue, setSelectedIssue] = useState<RepairIssue | null>(null);
   const [booking, setBooking] = useState<{ device: string; issue: string } | null>(null);
   const [resultLimit, setResultLimit] = useState(6);
-  const gallery = useRef<HTMLDivElement>(null);
+  const main = useRef<HTMLElement>(null);
+  useScrollMotion(main);
 
   const matches = useMemo(() => {
     const pool = selectedBrand === "All" ? devices : devices.filter((item) => item.brand === selectedBrand);
@@ -51,7 +54,7 @@ export default function Home() {
     <>
       <a href="#main-content" className="skip-link">Skip to content</a>
       <header className="site-header">
-        <a href="#top" aria-label="Cellzy home" className="logo-link"><Image src="/assets/cellzy-logo.png" alt="Cellzy" className="wordmark" width={340} height={120} preload /></a>
+        <a href="#top" aria-label="Cellzy home" className="logo-link"><Image src="/assets/cellzy-wordmark.svg" alt="Cellzy" className="wordmark" width={280} height={82} preload /></a>
         <nav aria-label="Main navigation" className="desktop-nav"><a href="#repairs">Repairs</a><a href="#devices">Devices</a><a href="#accessories">Accessories</a><a href="#visit">Our world</a></nav>
         <div className="header-actions">
           <button type="button" className="nav-book" onClick={openBooking}>Book a repair</button>
@@ -68,7 +71,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main id="main-content">
+      <main id="main-content" ref={main}>
         <ProductStory onBook={openBooking} />
         <div className="service-strip"><span><Clock3 />Most repairs in 30 minutes</span><span><Wrench />Care for iPhone & Android</span><span><ShieldCheck />Quote before we repair</span></div>
 
@@ -104,22 +107,21 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="product-spotlight" aria-labelledby="new-phone-title">
-          <Image src="/assets/products/iphone-18-pro-burgundy.jpg" alt="Camera and burgundy finish of iPhone 18 Pro Max" fill sizes="100vw" />
+        <section className="product-spotlight" aria-labelledby="new-phone-title" data-scroll-scene>
+          <Image src="/assets/products/iphone-18-pro-burgundy.jpg" alt="Camera and burgundy finish of iPhone 18 Pro Max" fill sizes="100vw" data-scroll-image />
           <div><p className="section-label">Meet the newest Pro</p><h2 id="new-phone-title">iPhone 18<br />Pro Max.</h2><p>Burgundy. A new point of view.</p><a className="light-button" href={inquiryLink("iPhone 18 Pro Max availability", ["I'm interested in the iPhone 18 Pro Max in burgundy."])}>Ask about availability <ArrowRight /></a><small>Contact us for local stock, pricing and arrival details.</small></div>
         </section>
 
         <section className="accessory-section section-space" id="accessories" aria-labelledby="accessories-title">
           <div className="section-heading"><div><p className="section-label">A little more you</p><h2 id="accessories-title">Good company<br />for your phone.</h2></div><p>From a case you love to a charger you can count on. Discover your everyday essentials, then reserve for pickup.</p></div>
-          <div className="accessory-feature"><Image src="/assets/brand/campaign-city.jpg" alt="Cellzy campaign: a woman taking a photograph with her phone" fill sizes="(max-width: 760px) 100vw, 88vw" /><div><span>Style. Meet everyday life.</span><a href={inquiryLink("Phone case reservation", ["I'd like to reserve a phone case.", "Phone model:", "Preferred style and colour:"])}>Find your next case <ArrowRight /></a></div></div>
+          <div className="accessory-feature" data-scroll-scene><Image src="/assets/brand/campaign-city.jpg" alt="Cellzy campaign: a woman taking a photograph with her phone" fill sizes="(max-width: 760px) 100vw, 88vw" data-scroll-image /><div><span>Style. Meet everyday life.</span><a href={inquiryLink("Phone case reservation", ["I'd like to reserve a phone case.", "Phone model:", "Preferred style and colour:"])}>Find your next case <ArrowRight /></a></div></div>
           <div className="category-grid">{categories.map(({ icon: Icon, title, copy }) => <article key={title}><Icon aria-hidden="true" /><h3>{title}</h3><p>{copy}</p><a className="text-link" href={inquiryLink(`${title} reservation`, [`I'd like to reserve an item from ${title}.`, "Phone model:", "Item, colour and quantity:"])}>Reserve an item <ArrowRight /></a></article>)}</div>
         </section>
 
         <section className="brand-world section-space" id="visit" aria-labelledby="visit-title">
           <div className="section-heading"><div><p className="section-label">Welcome to Cellzy</p><h2 id="visit-title">Real people.<br />A fresh perspective.</h2></div><p>Come for a case. Stay for a little advice. A welcoming space for your phone and everything that goes with it.</p></div>
-          <div className="store-cinema"><Image src="/assets/brand/store-overall.jpg" alt="Cellzy store design with circular displays and illuminated ceiling rings" fill sizes="(max-width: 760px) 100vw, 88vw" /><span>The Cellzy store concept</span></div>
-          <div className="gallery-heading"><p>Take a look around.</p><div><button type="button" aria-label="Previous store view" onClick={() => gallery.current?.scrollBy({ left: -gallery.current.clientWidth * .75, behavior: "smooth" })}><ArrowLeft /></button><button type="button" aria-label="Next store view" onClick={() => gallery.current?.scrollBy({ left: gallery.current.clientWidth * .75, behavior: "smooth" })}><ArrowRight /></button></div></div>
-          <div className="store-filmstrip" ref={gallery} tabIndex={0} role="region" aria-label="Cellzy store concept gallery">{storeImages.map(([src, alt]) => <figure key={src}><Image src={src} alt={alt} fill sizes="(max-width: 760px) 80vw, 44vw" /><figcaption>{alt}</figcaption></figure>)}</div>
+          <div className="store-cinema" data-scroll-scene><Image src="/assets/brand/store-overall.jpg" alt="Cellzy store design with circular displays and illuminated ceiling rings" fill sizes="(max-width: 760px) 100vw, 88vw" data-scroll-image /><span>The Cellzy store concept</span></div>
+          <StoreGallery images={storeImages} />
           <div className="life-heading"><p className="section-label">Life, connected.</p><p>Every age. Every style. Your Cellzy.</p></div>
           <div className="people-collage">{[
             ["/assets/brand/campaign-float.jpg", "A phone above an open hand"],
@@ -133,7 +135,7 @@ export default function Home() {
         </section>
         <section className="visit-callout"><div><p className="section-label">We’re here to help</p><h2>Let’s talk<br />about your phone.</h2></div><div><p>A repair, an upgrade, or the perfect accessory.<br />Tell us what you’re looking for.</p><a href="mailto:info@cellzy.com">info@cellzy.com <ArrowRight /></a><button type="button" className="light-button" onClick={openBooking}>Book a repair <ArrowRight /></button></div></section>
       </main>
-      <footer><a href="#top" aria-label="Cellzy home"><Image src="/assets/cellzy-logo.png" alt="Cellzy" className="wordmark" width={340} height={120} /></a><p>Phones. Accessories. Repairs.</p><a href="mailto:info@cellzy.com">info@cellzy.com</a><small>© {new Date().getFullYear()} Cellzy. Product names and trademarks belong to their respective owners.</small></footer>
+      <footer><a href="#top" aria-label="Cellzy home" className="logo-link"><Image src="/assets/cellzy-wordmark.svg" alt="Cellzy" className="wordmark" width={280} height={82} /></a><p>Phones. Accessories. Repairs.</p><a href="mailto:info@cellzy.com">info@cellzy.com</a><small>© {new Date().getFullYear()} Cellzy. Product names and trademarks belong to their respective owners.</small></footer>
       <Dialog open={Boolean(booking)} onOpenChange={(open) => { if (!open) setBooking(null); }}><DialogContent className="booking-dialog"><DialogTitle className="sr-only">Request a Cellzy repair appointment</DialogTitle><DialogDescription className="sr-only">Choose your device, repair and preferred visit. Prepare an email for Cellzy to confirm pricing and availability.</DialogDescription>{booking && <BookingFlow initialDevice={booking.device} initialIssue={booking.issue} />}</DialogContent></Dialog>
     </>
   );
@@ -144,7 +146,7 @@ function RepairIssueSelector({ device, selectedIssue, onSelect, onReserve }: { d
     <section className="repair-issue-selector" aria-labelledby="repair-issue-heading">
       <div className="issue-heading"><h3 id="repair-issue-heading">What needs attention?</h3><p>Choose the issue. We’ll confirm the right repair for your {device}.</p></div>
       <div className="issue-grid">{repairIssues.map((issue) => <button key={issue.id} type="button" className={`issue-card${selectedIssue?.id === issue.id ? " is-selected" : ""}`} aria-pressed={selectedIssue?.id === issue.id} onClick={() => onSelect(issue)}><div className="issue-image"><Image src={issue.image} alt="" fill sizes="(max-width: 760px) 45vw, 22vw" /><span className="issue-check" aria-hidden="true"><Check /></span></div><span className="issue-copy"><strong>{issue.title}</strong><small>{issue.copy}</small></span></button>)}</div>
-      <div className="issue-reserve-bar"><div role="status"><small>Your repair</small><strong>{selectedIssue ? `${device} · ${selectedIssue.title}` : "Select an issue to continue"}</strong></div><div className="issue-actions">{selectedIssue && <a className="text-link" href={inquiryLink(`Repair quote — ${device} — ${selectedIssue.title}`, [`Device: ${device}`, `Issue: ${selectedIssue.title}`, "Additional details:"])}>Email for a quote</a>}<button className="primary-button" type="button" disabled={!selectedIssue} onClick={onReserve}>Reserve this repair <ArrowRight /></button></div></div>
+      <div className="issue-reserve-bar"><div role="status"><small>Your repair</small><strong key={selectedIssue?.id || "empty"}>{selectedIssue ? `${device} · ${selectedIssue.title}` : "Select an issue to continue"}</strong></div><div className="issue-actions">{selectedIssue && <a className="primary-button quote-button" href={inquiryLink(`Repair quote — ${device} — ${selectedIssue.title}`, [`Device: ${device}`, `Issue: ${selectedIssue.title}`, "Additional details:"])}><Mail aria-hidden="true" />Email for a quote</a>}<button className="primary-button" type="button" disabled={!selectedIssue} onClick={onReserve}>Reserve this repair <ArrowRight /></button></div></div>
     </section>
   );
 }
